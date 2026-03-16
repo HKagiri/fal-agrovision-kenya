@@ -5,613 +5,1413 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgroVision Kenya — Farm Intelligence Platform</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --green-dark:#1a4a2e;--green-mid:#2d7a4f;--green-light:#4caf79;--green-pale:#e8f5ed;
-    --earth:#8b6914;--earth-light:#f5e6c0;--sky:#1976d2;--sky-light:#e3f0fc;
-    --warn:#e65100;--warn-light:#fff3e0;--text:#1a1a1a;--muted:#5a6472;--border:#d0ddd6;
-    --card-bg:#ffffff;--page-bg:#f4f7f5;
-  }
-  body{font-family:'DM Sans',sans-serif;background:var(--page-bg);color:var(--text);min-height:100vh}
-  .header{background:var(--green-dark);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100}
-  .logo{display:flex;align-items:center;gap:10px}
-  .logo-icon{width:32px;height:32px;background:var(--green-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
-  .logo-text{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;letter-spacing:-0.3px}
-  .logo-sub{font-size:10px;color:#a5d6b7;font-family:'DM Mono',monospace;letter-spacing:1px}
-  .header-right{display:flex;align-items:center;gap:12px}
-  .badge{background:rgba(76,175,121,0.25);color:#a5d6b7;font-size:11px;padding:3px 10px;border-radius:12px;font-family:'DM Mono',monospace}
-  .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 58px)}
-  .sidebar{background:#fff;border-right:1px solid var(--border);padding:1.5rem 0}
-  .nav-section{margin-bottom:1.5rem}
-  .nav-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);padding:0 1.25rem;margin-bottom:6px;font-family:'DM Mono',monospace}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:8px 1.25rem;font-size:13.5px;cursor:pointer;color:var(--muted);transition:all .15s;border-left:3px solid transparent}
-  .nav-item:hover{background:#f0faf4;color:var(--green-dark)}
-  .nav-item.active{background:var(--green-pale);color:var(--green-dark);border-left-color:var(--green-mid);font-weight:500}
-  .nav-icon{width:16px;height:16px;font-size:14px;display:flex;align-items:center;justify-content:center}
-  .main{padding:2rem;overflow-y:auto;max-height:calc(100vh - 58px)}
-  .page-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--green-dark);margin-bottom:4px}
-  .page-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
-  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
-  .card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--green-dark);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-  .upload-zone{border:2px dashed var(--green-light);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--green-pale);position:relative}
-  .upload-zone:hover{border-color:var(--green-mid);background:#d4edde}
-  .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-  .upload-icon{font-size:40px;margin-bottom:12px}
-  .upload-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--green-dark);margin-bottom:6px}
-  .upload-sub{font-size:13px;color:var(--muted)}
-  .upload-types{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-  .type-pill{background:white;border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-  .form-group{display:flex;flex-direction:column;gap:6px}
-  .form-label{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:0.3px}
-  .form-control{border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13.5px;font-family:'DM Sans',sans-serif;background:white;color:var(--text);outline:none;transition:border .15s}
-  .form-control:focus{border-color:var(--green-mid)}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif}
-  .btn-primary{background:var(--green-mid);color:white}
-  .btn-primary:hover{background:var(--green-dark)}
-  .btn-outline{background:white;color:var(--green-dark);border:1px solid var(--border)}
-  .btn-outline:hover{background:var(--green-pale)}
-  .btn-sm{padding:7px 14px;font-size:12.5px}
-  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
-  .metric-card{background:white;border:1px solid var(--border);border-radius:10px;padding:1rem;position:relative;overflow:hidden}
-  .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-  .metric-card.green::before{background:var(--green-mid)}
-  .metric-card.earth::before{background:var(--earth)}
-  .metric-card.sky::before{background:var(--sky)}
-  .metric-card.warn::before{background:var(--warn)}
-  .metric-label{font-size:11px;color:var(--muted);margin-bottom:4px;font-family:'DM Mono',monospace;letter-spacing:0.5px}
-  .metric-value{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:var(--text)}
-  .metric-unit{font-size:12px;color:var(--muted);margin-top:2px}
-  .metric-delta{font-size:11px;display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:2px 7px;border-radius:10px}
-  .delta-good{background:#e8f5ed;color:#2d7a4f}
-  .delta-bad{background:var(--warn-light);color:var(--warn)}
-  .delta-neutral{background:#f0f0f0;color:#666}
-  .tab-content{display:none}
-  .tab-content.active{display:block}
-  .vi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-  .vi-card{background:white;border:1px solid var(--border);border-radius:10px;padding:1rem}
-  .vi-name{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:2px}
-  .vi-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px}
-  .vi-bar{height:8px;border-radius:4px;background:#e8eceb;margin-bottom:8px;overflow:hidden}
-  .vi-fill{height:100%;border-radius:4px}
-  .vi-status{font-size:11px;padding:3px 10px;border-radius:10px;display:inline-block;font-weight:500}
-  .status-good{background:#e8f5ed;color:#1a6b3e}
-  .status-warn{background:var(--warn-light);color:var(--warn)}
-  .status-ok{background:var(--sky-light);color:#1565c0}
-  .status-low{background:var(--earth-light);color:#6d4c00}
-  .table{width:100%;border-collapse:collapse;font-size:13px}
-  .table th{text-align:left;padding:10px 12px;background:var(--green-pale);color:var(--green-dark);font-weight:500;font-size:11px;letter-spacing:0.5px;border-bottom:1px solid var(--border)}
-  .table td{padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
-  .table tr:hover td{background:#fafcfb}
-  .progress-bar{height:6px;background:#e8eceb;border-radius:3px;overflow:hidden}
-  .progress-fill{height:100%;border-radius:3px}
-  .alert{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px}
-  .alert-danger{background:#fdecea;border-left:3px solid #c62828;color:#7f1010}
-  .alert-warn{background:var(--warn-light);border-left:3px solid var(--warn);color:#6d2600}
-  .alert-success{background:var(--green-pale);border-left:3px solid var(--green-mid);color:#1a4a2e}
-  .alert-icon{font-size:14px;flex-shrink:0;margin-top:1px}
-  .crop-selector{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:1.5rem}
-  .crop-btn{border:1.5px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;background:white;font-size:12px;color:var(--muted)}
-  .crop-btn:hover,.crop-btn.selected{border-color:var(--green-mid);background:var(--green-pale);color:var(--green-dark);font-weight:500}
-  .crop-icon{font-size:22px;display:block;margin-bottom:4px}
-  .loading-overlay{display:none;position:fixed;inset:0;background:rgba(26,74,46,0.88);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-  .loading-overlay.show{display:flex}
-  .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading-text{color:#fff;font-family:'Syne',sans-serif;font-size:16px}
-  .loading-steps{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-  .loading-step{color:rgba(255,255,255,0.7);font-size:12px;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:8px}
-  .step-dot{width:6px;height:6px;border-radius:50%;background:var(--green-light);animation:pulse 1s infinite}
-  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
-  .map-placeholder{background:linear-gradient(135deg,#c8e6c9 0%,#a5d6a7 30%,#81c784 50%,#66bb6a 70%,#4caf50 100%);border-radius:10px;height:220px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-  .map-overlay{text-align:center;color:#1a4a2e}
-  .map-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0,rgba(255,255,255,.08) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0,rgba(255,255,255,.08) 1px,transparent 1px,transparent 40px)}
-  .ndvi-legend{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--muted)}
-  .ndvi-bar{flex:1;height:12px;border-radius:6px;background:linear-gradient(90deg,#8B0000,#FF4500,#FFA500,#FFFF00,#90EE90,#008000,#004d00)}
-  .ndvi-labels{display:flex;justify-content:space-between;flex:1;font-family:'DM Mono',monospace;font-size:10px}
-  .report-actions{display:flex;gap:10px;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap}
-  .ai-response{background:var(--green-pale);border:1px solid #b2dfcc;border-radius:10px;padding:1rem 1.25rem;margin-top:1rem;font-size:13.5px;line-height:1.7;color:var(--green-dark)}
-  .ai-badge{font-size:10px;font-family:'DM Mono',monospace;color:var(--green-mid);letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-  .ai-dot{width:6px;height:6px;border-radius:50%;background:var(--green-mid)}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-  .satellite-toggle{display:flex;align-items:center;gap:8px;padding:8px 12px;background:white;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px}
-  .toggle-switch{width:32px;height:18px;background:var(--border);border-radius:9px;position:relative;transition:.2s}
-  .toggle-switch.on{background:var(--green-mid)}
-  .toggle-knob{width:14px;height:14px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;transition:.2s}
-  .toggle-switch.on .toggle-knob{left:16px}
-  .timeline{position:relative;padding-left:1.5rem}
-  .timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--border)}
-  .timeline-item{position:relative;margin-bottom:1rem}
-  .timeline-dot{width:10px;height:10px;border-radius:50%;background:var(--green-mid);position:absolute;left:-1.9rem;top:3px;border:2px solid white}
-  .timeline-title{font-size:13px;font-weight:500;color:var(--text)}
-  .timeline-sub{font-size:12px;color:var(--muted)}
-  .mb-16{margin-bottom:16px}
-  .mt-12{margin-top:12px}
-  .api-key-notice{background:#fffbeb;border:1px solid #fbbf24;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:13px;color:#92400e}
-  .api-key-notice strong{color:#78350f}
-  @media(max-width:768px){
-    .layout{grid-template-columns:1fr}
-    .sidebar{display:none}
-    .metric-grid{grid-template-columns:repeat(2,1fr)}
-    .vi-grid{grid-template-columns:repeat(2,1fr)}
-    .grid-2{grid-template-columns:1fr}
-    .form-grid{grid-template-columns:1fr}
-  }
-  @media print{
-    .sidebar,.header,.report-actions,.loading-overlay,.api-key-notice{display:none!important}
-    .main{max-height:none;overflow:visible;padding:0}
-    .layout{grid-template-columns:1fr}
-    body{background:white}
-  }
-</style>
-</head>
-<body>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0d2b1a;--g2:#1a4a2e;--g3:#2d7a4f;--g4:#4caf79;--g5:#a8d5b5;--g6:#e8f5ed;
+  --earth:#7a5c14;--earth2:#f0e0a0;--sky:#1565c0;--sky2:#e3f0fc;
+  --warn:#bf4400;--warn2:#fff0e0;--red:#b71c1c;--red2:#fdecea;
+  --text:#111;--muted:#5c6b72;--border:#ccd9d0;--bg:#f2f5f3;--white:#fff;
+  --card-r:14px;--shadow:0 2px 12px rgba(0,0,0,.07);
+}
+html{font-size:14px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <div class="loading-text">Analyzing drone imagery...</div>
-  <div class="loading-steps">
-    <div class="loading-step"><div class="step-dot"></div><span id="step1">Processing RGB bands...</span></div>
-    <div class="loading-step"><div class="step-dot"></div><span id="step2">Computing vegetation indices...</span></div>
-    <div class="loading-step"><div class="step-dot"></div><span id="step3">Running soil analysis...</span></div>
-    <div class="loading-step"><div class="step-dot"></div><span id="step4">Generating AI insights...</span></div>
+/* ─── HEADER ─── */
+.hdr{background:var(--g1);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:54px;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,.06)}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-icon{width:30px;height:30px;background:var(--g3);border-radius:7px;display:grid;place-items:center;font-size:15px}
+.hdr-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;letter-spacing:-.3px}
+.hdr-sub{font-size:9px;color:#80b899;font-family:'DM Mono',monospace;letter-spacing:1.2px}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.chip{background:rgba(76,175,121,.2);color:#90d4a8;font-size:10px;padding:3px 9px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap}
+.chip.warn-chip{background:rgba(191,68,0,.25);color:#ffb07a}
+
+/* ─── LAYOUT ─── */
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 54px)}
+
+/* ─── SIDEBAR ─── */
+.sidebar{background:var(--white);border-right:1px solid var(--border);padding:1rem 0;overflow-y:auto;max-height:calc(100vh - 54px);position:sticky;top:54px}
+.nav-sec{margin-bottom:1.2rem}
+.nav-lbl{font-size:9px;letter-spacing:1.8px;color:var(--muted);padding:0 1rem;margin-bottom:4px;font-family:'DM Mono',monospace;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 1rem;font-size:12.5px;cursor:pointer;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
+.nav-item:hover{background:#f0faf4;color:var(--g2)}
+.nav-item.active{background:var(--g6);color:var(--g2);border-left-color:var(--g3);font-weight:500}
+.nav-ico{font-size:13px;width:14px;text-align:center}
+
+/* ─── MAIN ─── */
+.main{padding:1.5rem;overflow-y:auto;max-height:calc(100vh - 54px)}
+.pg{display:none}.pg.active{display:block}
+.pg-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--g2);margin-bottom:2px}
+.pg-sub{font-size:12px;color:var(--muted);margin-bottom:1.2rem}
+
+/* ─── CARDS ─── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--card-r);padding:1.1rem;box-shadow:var(--shadow)}
+.card-hd{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--g2);margin-bottom:.9rem;display:flex;align-items:center;gap:7px}
+.mb1{margin-bottom:1rem}.mt1{margin-top:1rem}
+
+/* ─── GRIDS ─── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* ─── METRIC CARDS ─── */
+.mc{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:.9rem;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.mc.c-g::before{background:var(--g3)}.mc.c-e::before{background:var(--earth)}.mc.c-s::before{background:var(--sky)}.mc.c-w::before{background:var(--warn)}
+.mc-lbl{font-size:9.5px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.5px;margin-bottom:3px}
+.mc-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+.mc-unit{font-size:11px;color:var(--muted);margin-top:1px}
+.mc-delta{font-size:10px;display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:2px 7px;border-radius:10px}
+.d-g{background:#e8f5ed;color:#1a6b3e}.d-b{background:var(--warn2);color:var(--warn)}.d-n{background:#f0f0f0;color:#666}
+
+/* ─── STATUS PILLS ─── */
+.pill{font-size:10px;padding:2px 9px;border-radius:10px;font-weight:500;display:inline-block}
+.p-g{background:#e8f5ed;color:#1a5c36}.p-w{background:var(--warn2);color:var(--warn)}.p-s{background:var(--sky2);color:#0d4790}.p-r{background:var(--red2);color:var(--red)}.p-e{background:var(--earth2);color:#5a3e00}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .13s;font-family:'DM Sans',sans-serif}
+.btn-p{background:var(--g3);color:#fff;border-color:var(--g3)}.btn-p:hover{background:var(--g2)}
+.btn-o{background:var(--white);color:var(--g2);border-color:var(--border)}.btn-o:hover{background:var(--g6)}
+.btn-d{background:var(--red);color:#fff}.btn-d:hover{background:#8b1212}
+.btn-s{padding:6px 12px;font-size:11.5px}
+.btn-full{width:100%;justify-content:center;padding:10px}
+
+/* ─── FORMS ─── */
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:11px;color:var(--muted);font-weight:500}
+.fc{border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);outline:none;width:100%;transition:border .12s}
+.fc:focus{border-color:var(--g3)}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+
+/* ─── UPLOAD ─── */
+.upz{border:2px dashed var(--g4);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--g6);position:relative;transition:all .2s}
+.upz:hover{border-color:var(--g3);background:#d8f0e2}
+.upz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upz-ico{font-size:32px;margin-bottom:8px}
+.upz-t{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--g2);margin-bottom:4px}
+.upz-s{font-size:11.5px;color:var(--muted)}
+.pills-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.type-pill{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* ─── CROPS ─── */
+.crop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:7px;margin-bottom:1rem}
+.cb{border:1.5px solid var(--border);border-radius:9px;padding:8px 5px;text-align:center;cursor:pointer;background:var(--white);font-size:11px;color:var(--muted);transition:all .13s;position:relative}
+.cb:hover,.cb.sel{border-color:var(--g3);background:var(--g6);color:var(--g2);font-weight:500}
+.cb-ico{font-size:20px;display:block;margin-bottom:3px}
+.cb .saved-badge{position:absolute;top:-5px;right:-5px;background:var(--g3);color:#fff;font-size:8px;padding:1px 5px;border-radius:8px;font-family:'DM Mono',monospace}
+
+/* ─── ALERTS ─── */
+.al{border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:7px;display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.al-r{background:var(--red2);border-left:3px solid var(--red);color:#6a0f0f}
+.al-w{background:var(--warn2);border-left:3px solid var(--warn);color:#6d2600}
+.al-g{background:var(--g6);border-left:3px solid var(--g3);color:#1a4a2e}
+.al-s{background:var(--sky2);border-left:3px solid var(--sky);color:#0d3b80}
+.al-ico{font-size:13px;flex-shrink:0;margin-top:1px}
+
+/* ─── TABLE ─── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;background:var(--g6);color:var(--g2);font-weight:500;font-size:10px;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.tbl td{padding:8px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.tbl tr:hover td{background:#fafcfb}
+
+/* ─── SATELLITE SELECTOR ─── */
+.sat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:1rem}
+.sat-card{border:1.5px solid var(--border);border-radius:10px;padding:.8rem;cursor:pointer;background:var(--white);transition:all .13s;position:relative}
+.sat-card:hover,.sat-card.sel{border-color:var(--sky);background:var(--sky2)}
+.sat-card.sel::after{content:'✓';position:absolute;top:6px;right:8px;color:var(--sky);font-weight:700;font-size:12px}
+.sat-name{font-weight:500;font-size:12px;color:var(--text);margin-bottom:2px}
+.sat-meta{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+.sat-band{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.sat-b{background:#e0e8ff;color:#1a3a8a;font-size:9px;padding:1px 6px;border-radius:6px;font-family:'DM Mono',monospace}
+
+/* ─── VEG INDEX GRID ─── */
+.vi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.vi-card{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:.9rem}
+.vi-nm{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:1px}
+.vi-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:5px}
+.vi-bar{height:7px;background:#e8eceb;border-radius:4px;overflow:hidden;margin-bottom:6px}
+.vi-fill{height:100%;border-radius:4px}
+.vi-full{font-size:10.5px;color:var(--muted);margin-bottom:5px}
+
+/* ─── MAP / IMAGE ANNOTATION ─── */
+.map-wrap{position:relative;border-radius:10px;overflow:hidden;background:#1a2e1a;border:1px solid var(--border)}
+.map-canvas{display:block;width:100%;cursor:crosshair}
+.ann-tooltip{position:absolute;background:rgba(13,43,26,.92);color:#fff;border-radius:8px;padding:8px 12px;font-size:11.5px;pointer-events:none;z-index:50;max-width:200px;box-shadow:0 4px 16px rgba(0,0,0,.3);border:1px solid rgba(76,175,121,.3);line-height:1.5;display:none}
+.ann-tooltip-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:var(--g4);margin-bottom:4px}
+.map-tools{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.map-tool-btn{padding:5px 11px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--muted);transition:all .12s}
+.map-tool-btn:hover,.map-tool-btn.active{background:var(--g3);color:#fff;border-color:var(--g3)}
+.map-legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
+.ml-item{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--muted)}
+.ml-dot{width:10px;height:10px;border-radius:50%}
+
+/* ─── MEASURE PANEL ─── */
+.measure-panel{background:var(--g6);border:1px solid #b2dfcc;border-radius:9px;padding:.9rem;margin-top:.8rem;font-size:12px}
+.measure-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #d0e8da}
+.measure-row:last-child{border:none;font-weight:500;color:var(--g2)}
+.measure-lbl{color:var(--muted)}
+.measure-val{font-family:'DM Mono',monospace;font-weight:500}
+
+/* ─── YIELD COUNTER ─── */
+.yield-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1rem}
+.yc{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:.8rem;text-align:center}
+.yc-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--g2)}
+.yc-lbl{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
+
+/* ─── FERTLIZER / WATER PANEL ─── */
+.npk-bar{display:flex;gap:4px;margin:.5rem 0;height:18px}
+.npk-seg{border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;font-family:'DM Mono',monospace}
+.water-viz{display:flex;align-items:flex-end;gap:6px;height:60px;margin:.5rem 0}
+.wv-bar{border-radius:4px 4px 0 0;flex:1;position:relative;transition:height .4s}
+.wv-lbl{font-size:9px;text-align:center;color:var(--muted);margin-top:3px}
+
+/* ─── SAVED SESSIONS ─── */
+.sessions-list{display:flex;flex-direction:column;gap:7px;max-height:260px;overflow-y:auto}
+.sess-item{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;background:var(--white);border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all .12s}
+.sess-item:hover{border-color:var(--g3);background:var(--g6)}
+.sess-name{font-weight:500;font-size:12.5px}
+.sess-meta{font-size:10.5px;color:var(--muted)}
+.sess-btns{display:flex;gap:5px}
+
+/* ─── AI PANEL ─── */
+.ai-box{background:var(--g6);border:1px solid #b2dfcc;border-radius:10px;padding:1rem;margin-top:.8rem;font-size:12.5px;line-height:1.7;color:var(--g2)}
+.ai-hd{font-size:9px;font-family:'DM Mono',monospace;color:var(--g3);letter-spacing:1px;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.ai-pulse{width:6px;height:6px;border-radius:50%;background:var(--g3);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ─── LOADING ─── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(13,43,26,.9);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.overlay.on{display:flex}
+.spin{width:44px;height:44px;border:4px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ov-txt{color:#fff;font-family:'Syne',sans-serif;font-size:15px}
+.ov-steps{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.ov-step{color:rgba(255,255,255,.65);font-size:11px;font-family:'DM Mono',monospace;display:flex;gap:7px;align-items:center}
+.sd{width:5px;height:5px;border-radius:50%;background:var(--g4);animation:pulse 1s infinite}
+
+/* ─── TIMELINE ─── */
+.timeline{padding-left:1.2rem;position:relative}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:.9rem}
+.tl-dot{width:9px;height:9px;border-radius:50%;background:var(--g3);position:absolute;left:-1.55rem;top:3px;border:2px solid var(--white)}
+.tl-t{font-size:12.5px;font-weight:500}
+.tl-s{font-size:11.5px;color:var(--muted)}
+
+/* ─── PROGRESS ─── */
+.pb{height:6px;background:#e8eceb;border-radius:3px;overflow:hidden}
+.pf{height:100%;border-radius:3px}
+
+/* ─── REPORT ─── */
+.report-header{border-bottom:3px solid var(--g2);padding-bottom:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-start}
+.report-watermark{font-size:9px;letter-spacing:2px;color:var(--g3);font-family:'DM Mono',monospace;margin-bottom:3px}
+.report-score{text-align:right}
+.report-score-val{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--g2)}
+.report-score-sub{font-size:10px;color:var(--g3)}
+.report-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem}
+.rk{background:var(--white);padding:.6rem;text-align:center}
+.rk-lbl{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace}
+.rk-val{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-top:2px}
+.report-section{margin-bottom:1.5rem}
+.rs-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--g2);padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:.8rem}
+.report-image-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.8rem;position:relative}
+.report-actions{display:flex;gap:8px;margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* ─── TABS ─── */
+.tab-row{display:flex;gap:3px;border-bottom:2px solid var(--border);margin-bottom:1rem}
+.tab{padding:6px 13px;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s;font-weight:500}
+.tab.on{color:var(--g2);border-bottom-color:var(--g3)}
+.tc{display:none}.tc.on{display:block}
+
+/* ─── NDVI MAP ─── */
+.ndvi-legend{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:10px;color:var(--muted)}
+.ndvi-bar-g{flex:1;height:11px;border-radius:5px;background:linear-gradient(90deg,#8B0000,#FF4500,#FFA500,#FFFF00,#90EE90,#008000,#004d00)}
+.ndvi-labels{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;margin-top:2px}
+
+/* ─── MISC ─── */
+code{font-family:'DM Mono',monospace;background:#f0f0f0;padding:1px 5px;border-radius:4px;font-size:11px}
+.divider{border:none;border-top:1px solid var(--border);margin:.8rem 0}
+.flex-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.text-muted{color:var(--muted)}
+.text-g{color:var(--g3)}
+.fw5{font-weight:500}
+.fmono{font-family:'DM Mono',monospace}
+
+@media(max-width:760px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .g2,.g3,.g4,.fg2{grid-template-columns:1fr}
+  .vi-grid{grid-template-columns:1fr 1fr}
+  .metric-grid{grid-template-columns:1fr 1fr}
+}
+@media print{
+  .sidebar,.hdr,.report-actions,.overlay,.api-notice,#nav-bar-mobile{display:none!important}
+  .main{max-height:none;overflow:visible;padding:.5rem}
+  .layout{grid-template-columns:1fr}
+  body{background:#fff}
+  .pg{display:block!important}
+  #page-report{display:block!important}
+}
+</style>
+
+<!-- BODY HTML -->
+<div class="overlay" id="loadOverlay">
+  <div class="spin"></div>
+  <div class="ov-txt">Analyzing farm data...</div>
+  <div class="ov-steps">
+    <div class="ov-step"><div class="sd"></div><span id="s1">Processing RGB bands...</span></div>
+    <div class="ov-step"><div class="sd"></div><span id="s2">Computing vegetation indices...</span></div>
+    <div class="ov-step"><div class="sd"></div><span id="s3">Running soil & fertilizer analysis...</span></div>
+    <div class="ov-step"><div class="sd"></div><span id="s4">Counting crops & estimating yield...</span></div>
+    <div class="ov-step"><div class="sd"></div><span id="s5">Fusing satellite data...</span></div>
   </div>
 </div>
 
-<div class="header">
-  <div class="logo">
-    <div class="logo-icon">🌿</div>
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-icon">🌿</div>
     <div>
-      <div class="logo-text">AgroVision Kenya</div>
-      <div class="logo-sub">DRONE · SATELLITE · AI ANALYTICS</div>
+      <div class="hdr-title">AgroVision Kenya</div>
+      <div class="hdr-sub">DRONE · SATELLITE · AI</div>
     </div>
   </div>
-  <div class="header-right">
-    <div class="badge" id="sessionCrop">No crop selected</div>
-    <div class="badge" id="sessionFarm">No farm loaded</div>
+  <div class="hdr-right">
+    <div class="chip" id="hdrCrop">No crop</div>
+    <div class="chip" id="hdrFarm">No farm</div>
+    <div class="chip warn-chip" id="hdrSat">No satellite</div>
   </div>
 </div>
 
 <div class="layout">
-  <div class="sidebar">
-    <div class="nav-section">
-      <div class="nav-label">Data Input</div>
-      <div class="nav-item active" onclick="showPage('upload')" id="nav-upload"><div class="nav-icon">📤</div> Upload Imagery</div>
-      <div class="nav-item" onclick="showPage('config')" id="nav-config"><div class="nav-icon">⚙️</div> Farm Config</div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-label">Analysis</div>
-      <div class="nav-item" onclick="showPage('vegetation')" id="nav-vegetation"><div class="nav-icon">🌱</div> Vegetation Indices</div>
-      <div class="nav-item" onclick="showPage('soil')" id="nav-soil"><div class="nav-icon">🪨</div> Soil Analysis</div>
-      <div class="nav-item" onclick="showPage('crophealth')" id="nav-crophealth"><div class="nav-icon">🌾</div> Crop Health</div>
-      <div class="nav-item" onclick="showPage('satellite')" id="nav-satellite"><div class="nav-icon">🛰️</div> Satellite Fusion</div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-label">Reports</div>
-      <div class="nav-item" onclick="showPage('insights')" id="nav-insights"><div class="nav-icon">🤖</div> AI Insights</div>
-      <div class="nav-item" onclick="showPage('report')" id="nav-report"><div class="nav-icon">📋</div> Full Report</div>
-    </div>
+<div class="sidebar">
+  <div class="nav-sec">
+    <div class="nav-lbl">Input</div>
+    <div class="nav-item active" onclick="nav('upload')" id="nv-upload"><div class="nav-ico">📤</div>Upload</div>
+    <div class="nav-item" onclick="nav('satellite')" id="nv-satellite"><div class="nav-ico">🛰️</div>Satellite Data</div>
+    <div class="nav-item" onclick="nav('sessions')" id="nv-sessions"><div class="nav-ico">💾</div>Saved Sessions</div>
   </div>
-
-  <div class="main" id="mainContent">
-
-    <!-- UPLOAD PAGE -->
-    <div id="page-upload" class="tab-content active">
-      <div class="page-title">Upload Farm Imagery</div>
-      <div class="page-sub">Upload drone RGB imagery and optionally fuse with satellite data</div>
-      <div class="api-key-notice">
-        <strong>⚙️ Setup required for AI features:</strong> To enable the AI Insights tab, open this file in a text editor, find <code>YOUR_ANTHROPIC_API_KEY_HERE</code> near the bottom and replace it with your Anthropic API key from <a href="https://console.anthropic.com" target="_blank" style="color:#92400e">console.anthropic.com</a>. All other features work without a key.
-      </div>
-      <div class="grid-2" style="gap:1.5rem">
-        <div>
-          <div class="card mb-16">
-            <div class="card-title">🚁 Drone RGB Imagery</div>
-            <div class="upload-zone">
-              <input type="file" accept="image/*,.tif,.tiff" multiple onchange="handleFileUpload(event,'drone')">
-              <div class="upload-icon">🛩️</div>
-              <div class="upload-title">Drop drone imagery here</div>
-              <div class="upload-sub">RGB orthomosaics, multispectral TIFFs</div>
-              <div class="upload-types">
-                <span class="type-pill">JPG</span><span class="type-pill">PNG</span><span class="type-pill">GeoTIFF</span><span class="type-pill">TIFF</span>
-              </div>
-            </div>
-            <div id="droneFiles" style="margin-top:12px"></div>
-          </div>
-          <div class="card">
-            <div class="card-title">🛰️ Satellite Data (Optional)</div>
-            <div class="upload-zone" style="padding:1.5rem">
-              <input type="file" accept=".tif,.tiff,.nc,.csv" onchange="handleFileUpload(event,'satellite')">
-              <div class="upload-icon" style="font-size:28px">📡</div>
-              <div class="upload-title" style="font-size:14px">Sentinel-2 / Landsat 8-9</div>
-              <div class="upload-sub">NDVI composites, NIR bands, multitemporal</div>
-              <div class="upload-types">
-                <span class="type-pill">GeoTIFF</span><span class="type-pill">NetCDF</span><span class="type-pill">CSV</span>
-              </div>
-            </div>
-            <div id="satFiles" style="margin-top:12px"></div>
-          </div>
-        </div>
-        <div>
-          <div class="card mb-16">
-            <div class="card-title">🌍 Farm Information</div>
-            <div class="form-grid">
-              <div class="form-group"><label class="form-label">Farm Name</label><input class="form-control" placeholder="e.g. Kiambu Tea Estate" id="farmName"></div>
-              <div class="form-group"><label class="form-label">County</label>
-                <select class="form-control" id="farmCounty">
-                  <option value="">Select County</option>
-                  <option>Kiambu</option><option>Murang'a</option><option>Nyeri</option><option>Meru</option><option>Embu</option>
-                  <option>Nakuru</option><option>Uasin Gishu</option><option>Trans Nzoia</option><option>Bungoma</option>
-                  <option>Kisii</option><option>Machakos</option><option>Makueni</option><option>Nyandarua</option>
-                  <option>Laikipia</option><option>Kwale</option><option>Taita Taveta</option><option>Other</option>
-                </select>
-              </div>
-              <div class="form-group"><label class="form-label">Farm Area (hectares)</label><input class="form-control" type="number" placeholder="e.g. 45" id="farmArea"></div>
-              <div class="form-group"><label class="form-label">Flight Altitude (m)</label><input class="form-control" type="number" placeholder="e.g. 120" id="flightAlt"></div>
-              <div class="form-group"><label class="form-label">Imagery Date</label><input class="form-control" type="date" id="imageryDate"></div>
-              <div class="form-group"><label class="form-label">Season</label>
-                <select class="form-control" id="cropSeason">
-                  <option>Long Rains (Mar-Jun)</option><option>Short Rains (Oct-Dec)</option><option>Dry Season</option><option>Irrigation</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title">🌾 Select Primary Crop</div>
-            <div class="crop-selector" id="cropSelector">
-              <div class="crop-btn selected" onclick="selectCrop(this,'Tea')"><span class="crop-icon">🍃</span>Tea</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Coffee')"><span class="crop-icon">☕</span>Coffee</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Maize')"><span class="crop-icon">🌽</span>Maize</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Wheat')"><span class="crop-icon">🌾</span>Wheat</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Potatoes')"><span class="crop-icon">🥔</span>Potatoes</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Carrots')"><span class="crop-icon">🥕</span>Carrots</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Sisal')"><span class="crop-icon">🌿</span>Sisal</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Sunflower')"><span class="crop-icon">🌻</span>Sunflower</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Pyrethrum')"><span class="crop-icon">🌸</span>Pyrethrum</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Sorghum')"><span class="crop-icon">🌾</span>Sorghum</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Cotton')"><span class="crop-icon">🌱</span>Cotton</div>
-              <div class="crop-btn" onclick="selectCrop(this,'Horticultural')"><span class="crop-icon">🥬</span>Horticulture</div>
-            </div>
-            <button class="btn btn-primary" onclick="runAnalysis()" style="width:100%;justify-content:center;padding:12px">🔬 Run Full Analysis</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VEGETATION PAGE -->
-    <div id="page-vegetation" class="tab-content">
-      <div class="page-title">Vegetation Indices</div>
-      <div class="page-sub">Computed from drone RGB · <span id="vi-crop-label" style="color:var(--green-mid);font-weight:500">Tea</span> thresholds applied</div>
-      <div class="metric-grid">
-        <div class="metric-card green"><div class="metric-label">OVERALL HEALTH</div><div class="metric-value">78%</div><div class="metric-unit">Canopy health score</div><span class="metric-delta delta-good">↑ Good</span></div>
-        <div class="metric-card earth"><div class="metric-label">STRESSED AREA</div><div class="metric-value">12%</div><div class="metric-unit">of total farm area</div><span class="metric-delta delta-bad">⚠ Monitor</span></div>
-        <div class="metric-card sky"><div class="metric-label">CROP COVER</div><div class="metric-value">85%</div><div class="metric-unit">Ground cover density</div><span class="metric-delta delta-good">↑ Optimal</span></div>
-        <div class="metric-card warn"><div class="metric-label">BARE PATCHES</div><div class="metric-value">3%</div><div class="metric-unit">Exposed soil areas</div><span class="metric-delta delta-neutral">→ Low</span></div>
-      </div>
-      <div class="vi-grid" id="viGrid"></div>
-      <div class="card" style="margin-top:1rem">
-        <div class="card-title">🗺️ Vegetation Map (NDVI Visualization)</div>
-        <div class="map-placeholder"><div class="map-grid"></div><div class="map-overlay"><div style="font-size:28px">🗺️</div><div style="font-family:'Syne',sans-serif;font-weight:600;font-size:15px;margin:6px 0">Spatial NDVI Distribution</div><div style="font-size:12px">Upload imagery to generate real spatial map</div></div></div>
-        <div class="ndvi-legend"><span style="font-size:10px;white-space:nowrap">Bare soil</span><div class="ndvi-bar"></div><span style="font-size:10px;white-space:nowrap">Dense veg.</span></div>
-        <div style="display:flex;justify-content:space-between;flex:1;font-family:'DM Mono',monospace;font-size:10px;margin-top:4px"><span>-1.0</span><span>-0.5</span><span>0.0</span><span>0.5</span><span>1.0</span></div>
-      </div>
-      <div class="card" style="margin-top:1rem">
-        <div class="card-title">📊 Zone-wise Vegetation Breakdown</div>
-        <div style="position:relative;width:100%;height:260px"><canvas id="zoneChart"></canvas></div>
-      </div>
-    </div>
-
-    <!-- SOIL PAGE -->
-    <div id="page-soil" class="tab-content">
-      <div class="page-title">Soil Analysis</div>
-      <div class="page-sub">RGB-derived soil indices · Enhanced with satellite multispectral data</div>
-      <div class="metric-grid">
-        <div class="metric-card green"><div class="metric-label">SOIL MOISTURE</div><div class="metric-value">62%</div><div class="metric-unit">Relative moisture index</div><span class="metric-delta delta-good">↑ Adequate</span></div>
-        <div class="metric-card earth"><div class="metric-label">ORGANIC MATTER</div><div class="metric-value">3.8%</div><div class="metric-unit">Estimated OM content</div><span class="metric-delta delta-good">↑ Good</span></div>
-        <div class="metric-card sky"><div class="metric-label">ESTIMATED pH</div><div class="metric-value">6.2</div><div class="metric-unit">Spectral pH estimate</div><span class="metric-delta delta-good">↑ Ideal</span></div>
-        <div class="metric-card warn"><div class="metric-label">EROSION RISK</div><div class="metric-value">Low</div><div class="metric-unit">Slope + bare soil index</div><span class="metric-delta delta-good">↓ Stable</span></div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title">🧪 Soil Composition Estimate</div>
-          <table class="table"><thead><tr><th>Parameter</th><th>Value</th><th>Status</th><th>Optimal Range</th></tr></thead><tbody id="soilTable"></tbody></table>
-        </div>
-        <div class="card">
-          <div class="card-title">💧 Soil Moisture Zones</div>
-          <div style="position:relative;width:100%;height:220px"><canvas id="moistureChart"></canvas></div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:1rem"><div class="card-title">⚠️ Soil Health Alerts</div><div id="soilAlerts"></div></div>
-    </div>
-
-    <!-- CROP HEALTH PAGE -->
-    <div id="page-crophealth" class="tab-content">
-      <div class="page-title">Crop Health Assessment</div>
-      <div class="page-sub" id="cropHealthSub">Tea · Kiambu Highland variety · Long Rains season</div>
-      <div class="grid-2" style="margin-bottom:1rem">
-        <div class="card"><div class="card-title">🌱 Growth Stage Analysis</div><div id="growthStages"></div></div>
-        <div class="card"><div class="card-title">🦠 Disease & Pest Risk</div><div id="diseaseRisks"></div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📈 Yield Prediction</div>
-        <div class="metric-grid" style="margin-bottom:0">
-          <div class="metric-card green"><div class="metric-label">EST. YIELD</div><div class="metric-value" id="estYield">2,840</div><div class="metric-unit">kg/ha (predicted)</div></div>
-          <div class="metric-card sky"><div class="metric-label">YIELD SCORE</div><div class="metric-value">82%</div><div class="metric-unit">vs. county average</div></div>
-          <div class="metric-card earth"><div class="metric-label">INTERVENTION ZONES</div><div class="metric-value">4</div><div class="metric-unit">Areas needing action</div></div>
-          <div class="metric-card warn"><div class="metric-label">HARVEST READINESS</div><div class="metric-value">67%</div><div class="metric-unit">Maturity index</div></div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:1rem"><div class="card-title">🗓️ Recommended Actions Timeline</div><div class="timeline" id="actionTimeline"></div></div>
-    </div>
-
-    <!-- SATELLITE PAGE -->
-    <div id="page-satellite" class="tab-content">
-      <div class="page-title">Satellite Data Fusion</div>
-      <div class="page-sub">Merge drone data with Sentinel-2 / Landsat for comprehensive temporal analysis</div>
-      <div class="card mb-16">
-        <div class="card-title">🛰️ Data Sources Active</div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px">
-          <div class="satellite-toggle" onclick="toggleSatellite(this,'sentinel2')"><div class="toggle-switch on" id="toggle-sentinel2"><div class="toggle-knob"></div></div><div><div style="font-size:13px;font-weight:500">Sentinel-2</div><div style="font-size:11px;color:var(--muted)">10m res · 5-day revisit</div></div></div>
-          <div class="satellite-toggle" onclick="toggleSatellite(this,'landsat')"><div class="toggle-switch" id="toggle-landsat"><div class="toggle-knob"></div></div><div><div style="font-size:13px;font-weight:500">Landsat 8/9</div><div style="font-size:11px;color:var(--muted)">30m res · 16-day revisit</div></div></div>
-          <div class="satellite-toggle" onclick="toggleSatellite(this,'modis')"><div class="toggle-switch" id="toggle-modis"><div class="toggle-knob"></div></div><div><div style="font-size:13px;font-weight:500">MODIS</div><div style="font-size:11px;color:var(--muted)">250m res · daily</div></div></div>
-          <div class="satellite-toggle" onclick="toggleSatellite(this,'srtm')"><div class="toggle-switch on" id="toggle-srtm"><div class="toggle-knob"></div></div><div><div style="font-size:13px;font-weight:500">SRTM DEM</div><div style="font-size:11px;color:var(--muted)">30m elevation data</div></div></div>
-        </div>
-      </div>
-      <div class="grid-2">
-        <div class="card"><div class="card-title">📅 Temporal NDVI Trend (12 months)</div><div style="position:relative;width:100%;height:220px"><canvas id="temporalChart"></canvas></div></div>
-        <div class="card"><div class="card-title">🌧️ Rainfall vs. NDVI Correlation</div><div style="position:relative;width:100%;height:220px"><canvas id="rainfallChart"></canvas></div></div>
-      </div>
-      <div class="card" style="margin-top:1rem">
-        <div class="card-title">🏔️ Topographic Analysis (SRTM)</div>
-        <div class="metric-grid" style="margin-bottom:0">
-          <div class="metric-card sky"><div class="metric-label">AVG ELEVATION</div><div class="metric-value">1,842m</div><div class="metric-unit">Above sea level</div></div>
-          <div class="metric-card green"><div class="metric-label">AVG SLOPE</div><div class="metric-value">8.4°</div><div class="metric-unit">Terrain gradient</div></div>
-          <div class="metric-card earth"><div class="metric-label">ASPECT</div><div class="metric-value">SE</div><div class="metric-unit">South-east facing</div></div>
-          <div class="metric-card warn"><div class="metric-label">DRAINAGE</div><div class="metric-value">Good</div><div class="metric-unit">Flow accumulation</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AI INSIGHTS PAGE -->
-    <div id="page-insights" class="tab-content">
-      <div class="page-title">AI-Powered Insights</div>
-      <div class="page-sub">Powered by Claude · Kenya-specific agronomic knowledge base</div>
-      <div class="card mb-16">
-        <div class="card-title">💬 Ask About Your Farm</div>
-        <div style="display:flex;gap:8px;margin-bottom:12px">
-          <input class="form-control" id="aiQuestion" placeholder="e.g. What is causing the yellowing in Zone 3? When should I apply fertilizer?" style="flex:1">
-          <button class="btn btn-primary" onclick="askAI()">Ask AI ↗</button>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px">
-          <button class="btn btn-outline btn-sm" onclick="quickAsk('What are the main yield-limiting factors on this farm?')">Yield limits?</button>
-          <button class="btn btn-outline btn-sm" onclick="quickAsk('Generate a fertilization recommendation for this crop and season.')">Fertilizer plan</button>
-          <button class="btn btn-outline btn-sm" onclick="quickAsk('What diseases should I watch for based on current crop health?')">Disease risks</button>
-          <button class="btn btn-outline btn-sm" onclick="quickAsk('Compare my farm performance to typical Kenya benchmarks.')">Benchmarks</button>
-          <button class="btn btn-outline btn-sm" onclick="quickAsk('What irrigation schedule do you recommend for the current soil moisture levels?')">Irrigation plan</button>
-        </div>
-        <div id="aiResponseContainer" style="display:none">
-          <div class="ai-response" id="aiResponse">
-            <div class="ai-badge"><div class="ai-dot" id="aiDot"></div>AI ANALYSIS</div>
-            <div id="aiText"></div>
-          </div>
-        </div>
-      </div>
-      <div class="card"><div class="card-title">🔍 Automated Findings</div><div id="autoFindings"></div></div>
-    </div>
-
-    <!-- REPORT PAGE -->
-    <div id="page-report" class="tab-content">
-      <div class="page-title">Farm Intelligence Report</div>
-      <div class="page-sub">Comprehensive PDF-ready report with all analysis results</div>
-      <div class="card mb-16" id="reportPreview">
-        <div style="border-bottom:3px solid var(--green-dark);padding-bottom:1rem;margin-bottom:1.5rem">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div>
-              <div style="font-size:10px;letter-spacing:2px;color:var(--green-mid);font-family:'DM Mono',monospace;margin-bottom:4px">AGROVISION KENYA · FARM INTELLIGENCE REPORT</div>
-              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--green-dark)" id="reportFarmName">Farm Analysis Report</div>
-              <div style="font-size:13px;color:var(--muted);margin-top:4px" id="reportMeta">Generated: — · Crop: — · Season: —</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">OVERALL SCORE</div>
-              <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--green-dark)">78</div>
-              <div style="font-size:11px;color:var(--green-mid)">/ 100</div>
-            </div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem">
-          <div style="background:white;padding:.75rem;text-align:center"><div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">NDVI SCORE</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--green-mid)">0.62</div></div>
-          <div style="background:white;padding:.75rem;text-align:center"><div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">SOIL HEALTH</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--earth)">Good</div></div>
-          <div style="background:white;padding:.75rem;text-align:center"><div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">YIELD FORECAST</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--sky)">+12%</div></div>
-        </div>
-        <div id="reportSections"></div>
-      </div>
-      <div class="report-actions">
-        <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
-        <button class="btn btn-outline" onclick="generateFullReport()">🤖 Generate Full AI Report ↗</button>
-      </div>
-    </div>
-
+  <div class="nav-sec">
+    <div class="nav-lbl">Analysis</div>
+    <div class="nav-item" onclick="nav('mapview')" id="nv-mapview"><div class="nav-ico">🗺️</div>Map & Annotate</div>
+    <div class="nav-item" onclick="nav('vegetation')" id="nv-vegetation"><div class="nav-ico">🌱</div>Vegetation</div>
+    <div class="nav-item" onclick="nav('soil')" id="nv-soil"><div class="nav-ico">🪨</div>Soil & Fertilizer</div>
+    <div class="nav-item" onclick="nav('cropcount')" id="nv-cropcount"><div class="nav-ico">🔢</div>Crop Count & Yield</div>
+    <div class="nav-item" onclick="nav('water')" id="nv-water"><div class="nav-ico">💧</div>Water Management</div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl">Output</div>
+    <div class="nav-item" onclick="nav('insights')" id="nv-insights"><div class="nav-ico">🤖</div>AI Insights</div>
+    <div class="nav-item" onclick="nav('report')" id="nv-report"><div class="nav-ico">📋</div>Full Report</div>
   </div>
 </div>
 
+<div class="main">
+
+<!-- ═══ UPLOAD ═══ -->
+<div class="pg active" id="page-upload">
+  <div class="pg-title">Upload Farm Imagery</div>
+  <div class="pg-sub">Upload drone imagery · configure farm · select crop</div>
+  <div class="al al-s mb1"><div class="al-ico">ℹ️</div><div><strong>API Key for AI:</strong> Open this file in a text editor, find <code>YOUR_KEY_HERE</code> and replace with your <a href="https://console.anthropic.com" target="_blank" style="color:#0d4790">Anthropic API key</a>.</div></div>
+  <div class="g2" style="gap:1.2rem">
+    <div>
+      <div class="card mb1">
+        <div class="card-hd">🚁 Drone RGB Imagery</div>
+        <div class="upz" id="droneZone">
+          <input type="file" accept="image/*,.tif,.tiff" multiple onchange="handleUpload(event,'drone')">
+          <div class="upz-ico">🛩️</div>
+          <div class="upz-t">Drop drone imagery here</div>
+          <div class="upz-s">RGB orthomosaics · GeoTIFFs · JPG/PNG</div>
+          <div class="pills-row"><span class="type-pill">JPG</span><span class="type-pill">PNG</span><span class="type-pill">GeoTIFF</span><span class="type-pill">TIFF</span></div>
+        </div>
+        <div id="droneFiles" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">🌍 Farm Information</div>
+        <div class="fg2">
+          <div class="fg"><label class="fl">Farm Name</label><input class="fc" id="farmName" placeholder="e.g. Kiambu Tea Estate"></div>
+          <div class="fg"><label class="fl">County</label>
+            <select class="fc" id="farmCounty">
+              <option value="">Select County</option>
+              <option>Kiambu</option><option>Murang'a</option><option>Nyeri</option><option>Meru</option><option>Embu</option>
+              <option>Nakuru</option><option>Uasin Gishu</option><option>Trans Nzoia</option><option>Bungoma</option>
+              <option>Kisii</option><option>Machakos</option><option>Makueni</option><option>Nyandarua</option>
+              <option>Laikipia</option><option>Kwale</option><option>Taita Taveta</option><option>Other</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Area (hectares)</label><input class="fc" type="number" id="farmArea" placeholder="e.g. 45"></div>
+          <div class="fg"><label class="fl">Flight Altitude (m)</label><input class="fc" type="number" id="flightAlt" placeholder="e.g. 120"></div>
+          <div class="fg"><label class="fl">Imagery Date</label><input class="fc" type="date" id="imgDate"></div>
+          <div class="fg"><label class="fl">Season</label>
+            <select class="fc" id="season">
+              <option>Long Rains (Mar–Jun)</option><option>Short Rains (Oct–Dec)</option><option>Dry Season</option><option>Irrigation</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card mb1">
+        <div class="card-hd">🌾 Select Primary Crop</div>
+        <div class="crop-grid" id="cropGrid">
+          <div class="cb sel" onclick="selCrop(this,'Tea')"><span class="cb-ico">🍃</span>Tea</div>
+          <div class="cb" onclick="selCrop(this,'Coffee')"><span class="cb-ico">☕</span>Coffee</div>
+          <div class="cb" onclick="selCrop(this,'Maize')"><span class="cb-ico">🌽</span>Maize</div>
+          <div class="cb" onclick="selCrop(this,'Wheat')"><span class="cb-ico">🌾</span>Wheat</div>
+          <div class="cb" onclick="selCrop(this,'Rice')"><span class="cb-ico">🍚</span>Rice</div>
+          <div class="cb" onclick="selCrop(this,'Avocado')"><span class="cb-ico">🥑</span>Avocado</div>
+          <div class="cb" onclick="selCrop(this,'Potatoes')"><span class="cb-ico">🥔</span>Potatoes</div>
+          <div class="cb" onclick="selCrop(this,'Carrots')"><span class="cb-ico">🥕</span>Carrots</div>
+          <div class="cb" onclick="selCrop(this,'Sisal')"><span class="cb-ico">🌿</span>Sisal</div>
+          <div class="cb" onclick="selCrop(this,'Sunflower')"><span class="cb-ico">🌻</span>Sunflower</div>
+          <div class="cb" onclick="selCrop(this,'Pyrethrum')"><span class="cb-ico">🌸</span>Pyrethrum</div>
+          <div class="cb" onclick="selCrop(this,'Sorghum')"><span class="cb-ico">🌾</span>Sorghum</div>
+          <div class="cb" onclick="selCrop(this,'Cotton')"><span class="cb-ico">🌱</span>Cotton</div>
+          <div class="cb" onclick="selCrop(this,'Horticultural')"><span class="cb-ico">🥬</span>Horticulture</div>
+        </div>
+        <div class="flex-row mb1">
+          <button class="btn btn-o btn-s" onclick="nav('sessions')">📂 Load Saved Session</button>
+          <button class="btn btn-o btn-s" onclick="saveSession()">💾 Save This Session</button>
+        </div>
+        <button class="btn btn-p btn-full" onclick="runAnalysis()">🔬 Run Full Analysis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SATELLITE ═══ -->
+<div class="pg" id="page-satellite">
+  <div class="pg-title">Satellite Data Selection</div>
+  <div class="pg-sub">Choose which satellite sources to fuse with your drone data for enhanced analysis</div>
+  <div class="card mb1">
+    <div class="card-hd">🛰️ Available Satellite Sources</div>
+    <div class="sat-grid" id="satGrid">
+      <div class="sat-card sel" onclick="togSat(this,'S2')" data-id="S2">
+        <div class="sat-name">Sentinel-2</div>
+        <div class="sat-meta">ESA · 10m res · 5-day revisit</div>
+        <div class="sat-band"><span class="sat-b">RGB</span><span class="sat-b">NIR</span><span class="sat-b">SWIR</span><span class="sat-b">Red Edge</span></div>
+      </div>
+      <div class="sat-card" onclick="togSat(this,'L8')" data-id="L8">
+        <div class="sat-name">Landsat 8/9</div>
+        <div class="sat-meta">USGS · 30m res · 16-day revisit</div>
+        <div class="sat-band"><span class="sat-b">OLI</span><span class="sat-b">TIRS</span><span class="sat-b">Thermal</span></div>
+      </div>
+      <div class="sat-card" onclick="togSat(this,'MODIS')" data-id="MODIS">
+        <div class="sat-name">MODIS Terra/Aqua</div>
+        <div class="sat-meta">NASA · 250m res · Daily</div>
+        <div class="sat-band"><span class="sat-b">NDVI</span><span class="sat-b">EVI</span><span class="sat-b">LST</span></div>
+      </div>
+      <div class="sat-card sel" onclick="togSat(this,'SRTM')" data-id="SRTM">
+        <div class="sat-name">SRTM DEM</div>
+        <div class="sat-meta">NASA · 30m elevation · Global</div>
+        <div class="sat-band"><span class="sat-b">Elevation</span><span class="sat-b">Slope</span><span class="sat-b">Aspect</span></div>
+      </div>
+      <div class="sat-card" onclick="togSat(this,'CHIRPS')" data-id="CHIRPS">
+        <div class="sat-name">CHIRPS Rainfall</div>
+        <div class="sat-meta">UCSB · 5km res · Daily/Monthly</div>
+        <div class="sat-band"><span class="sat-b">Precipitation</span><span class="sat-b">Anomaly</span></div>
+      </div>
+      <div class="sat-card" onclick="togSat(this,'GRACE')" data-id="GRACE">
+        <div class="sat-name">GRACE Groundwater</div>
+        <div class="sat-meta">NASA/DLR · Groundwater anomaly</div>
+        <div class="sat-band"><span class="sat-b">TWS</span><span class="sat-b">GWS</span></div>
+      </div>
+      <div class="sat-card" onclick="togSat(this,'S1')" data-id="S1">
+        <div class="sat-name">Sentinel-1 SAR</div>
+        <div class="sat-meta">ESA · 10m res · 6-day revisit</div>
+        <div class="sat-band"><span class="sat-b">VV</span><span class="sat-b">VH</span><span class="sat-b">Soil Moisture</span></div>
+      </div>
+      <div class="sat-card" onclick="togSat(this,'ERA5')" data-id="ERA5">
+        <div class="sat-name">ERA5 Climate</div>
+        <div class="sat-meta">ECMWF · Reanalysis · Hourly</div>
+        <div class="sat-band"><span class="sat-b">Temp</span><span class="sat-b">Humidity</span><span class="sat-b">Wind</span></div>
+      </div>
+    </div>
+    <div class="card-hd" style="margin-top:.5rem">📅 Date Range for Satellite Pull</div>
+    <div class="fg2">
+      <div class="fg"><label class="fl">From Date</label><input class="fc" type="date" id="satFrom"></div>
+      <div class="fg"><label class="fl">To Date</label><input class="fc" type="date" id="satTo"></div>
+    </div>
+    <div style="margin-top:.8rem">
+      <div class="card-hd">🔗 Upload Custom Satellite File</div>
+      <div class="upz" style="padding:1rem">
+        <input type="file" accept=".tif,.tiff,.nc,.csv,.zip" onchange="handleUpload(event,'satellite')">
+        <div class="upz-ico" style="font-size:24px">📡</div>
+        <div class="upz-t" style="font-size:12.5px">Upload custom satellite export</div>
+        <div class="upz-s">GeoTIFF · NetCDF · CSV · Shapefile ZIP</div>
+      </div>
+      <div id="satFiles" style="margin-top:6px"></div>
+    </div>
+  </div>
+  <div id="satSummary" class="al al-g" style="display:none">
+    <div class="al-ico">✅</div><div id="satSummaryTxt"></div>
+  </div>
+</div>
+
+<!-- ═══ SESSIONS ═══ -->
+<div class="pg" id="page-sessions">
+  <div class="pg-title">Saved Sessions</div>
+  <div class="pg-sub">Load a previous farm analysis or switch between different crops</div>
+  <div class="card mb1">
+    <div class="card-hd">📂 Saved Farm Sessions</div>
+    <div class="sessions-list" id="sessionsList"></div>
+    <div style="margin-top:.8rem;text-align:center;color:var(--muted);font-size:12px" id="noSessions">No saved sessions yet. Run an analysis and save it.</div>
+  </div>
+  <div class="card">
+    <div class="card-hd">➕ Start New Session</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:.8rem">Clear current data and start fresh analysis for a different farm or crop.</p>
+    <button class="btn btn-o" onclick="newSession()">🔄 New Session</button>
+  </div>
+</div>
+
+<!-- ═══ MAP & ANNOTATE ═══ -->
+<div class="pg" id="page-mapview">
+  <div class="pg-title">Map View & Annotation</div>
+  <div class="pg-sub">Click any point on the image for detailed zone analysis · Draw zones · Measure area</div>
+  <div class="card mb1">
+    <div class="card-hd">🗺️ Interactive Farm Map</div>
+    <div class="map-tools">
+      <button class="map-tool-btn active" id="tool-point" onclick="setTool('point')">📍 Point Analysis</button>
+      <button class="map-tool-btn" id="tool-measure" onclick="setTool('measure')">📐 Measure Area</button>
+      <button class="map-tool-btn" id="tool-zone" onclick="setTool('zone')">🔲 Mark Zone</button>
+      <button class="map-tool-btn" id="tool-ndvi" onclick="setTool('ndvi')">🌿 NDVI Overlay</button>
+      <button class="map-tool-btn" onclick="clearAnnotations()">🗑️ Clear</button>
+    </div>
+    <div class="map-wrap" id="mapWrap">
+      <canvas id="mapCanvas" class="map-canvas" width="800" height="450"></canvas>
+      <div class="ann-tooltip" id="annTooltip">
+        <div class="ann-tooltip-title" id="annTitle">Zone Analysis</div>
+        <div id="annBody"></div>
+      </div>
+    </div>
+    <div class="ndvi-legend"><span style="white-space:nowrap;font-size:10px">Bare soil</span><div class="ndvi-bar-g"></div><span style="white-space:nowrap;font-size:10px">Dense veg.</span></div>
+    <div class="ndvi-labels"><span>-1.0</span><span>-0.5</span><span>0.0</span><span>0.5</span><span>1.0</span></div>
+    <div class="map-legend mt1">
+      <div class="ml-item"><div class="ml-dot" style="background:#4caf79"></div>Healthy vegetation</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#ffa500"></div>Stressed zones</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#e53935"></div>Critical areas</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#1976d2"></div>Water bodies</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#8b6914"></div>Bare soil</div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">📐 Area Measurements</div>
+      <div class="measure-panel" id="measurePanel">
+        <div class="measure-row"><span class="measure-lbl">Total Farm Area</span><span class="measure-val" id="mTotalArea">—</span></div>
+        <div class="measure-row"><span class="measure-lbl">Vegetated Area</span><span class="measure-val" id="mVegArea">—</span></div>
+        <div class="measure-row"><span class="measure-lbl">Stressed Area</span><span class="measure-val" id="mStressArea">—</span></div>
+        <div class="measure-row"><span class="measure-lbl">Bare Soil Area</span><span class="measure-val" id="mBareArea">—</span></div>
+        <div class="measure-row"><span class="measure-lbl">Selected Zone Area</span><span class="measure-val" id="mZoneArea">Click to measure</span></div>
+        <div class="measure-row" style="font-weight:600"><span class="measure-lbl">Resolution</span><span class="measure-val" id="mRes">—</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd">🔍 Zone Details</div>
+      <div id="zoneDetails">
+        <p style="font-size:12px;color:var(--muted)">Click a point on the map to see detailed analysis for that zone.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VEGETATION ═══ -->
+<div class="pg" id="page-vegetation">
+  <div class="pg-title">Vegetation Indices</div>
+  <div class="pg-sub" id="vegSub">RGB-derived indices · Crop-specific thresholds applied</div>
+  <div class="g4 mb1">
+    <div class="mc c-g"><div class="mc-lbl">OVERALL HEALTH</div><div class="mc-val">78%</div><div class="mc-unit">Canopy score</div><span class="mc-delta d-g">↑ Good</span></div>
+    <div class="mc c-e"><div class="mc-lbl">STRESSED AREA</div><div class="mc-val">12%</div><div class="mc-unit">of farm area</div><span class="mc-delta d-b">⚠ Monitor</span></div>
+    <div class="mc c-s"><div class="mc-lbl">CROP COVER</div><div class="mc-val">85%</div><div class="mc-unit">Ground density</div><span class="mc-delta d-g">↑ Optimal</span></div>
+    <div class="mc c-w"><div class="mc-lbl">BARE PATCHES</div><div class="mc-val">3%</div><div class="mc-unit">Exposed soil</div><span class="mc-delta d-n">→ Low</span></div>
+  </div>
+  <div class="vi-grid mb1" id="viGrid"></div>
+  <div class="card mt1">
+    <div class="card-hd">📊 Zone-wise NDVI Breakdown</div>
+    <div style="position:relative;width:100%;height:240px"><canvas id="zoneChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ═══ SOIL & FERTILIZER ═══ -->
+<div class="pg" id="page-soil">
+  <div class="pg-title">Soil Analysis & Fertilizer Plan</div>
+  <div class="pg-sub">Spectral soil indices · NPK estimation · Crop-specific fertilizer recommendations</div>
+  <div class="g4 mb1">
+    <div class="mc c-g"><div class="mc-lbl">SOIL MOISTURE</div><div class="mc-val">62%</div><div class="mc-unit">Relative index</div><span class="mc-delta d-g">↑ Adequate</span></div>
+    <div class="mc c-e"><div class="mc-lbl">ORGANIC MATTER</div><div class="mc-val">3.8%</div><div class="mc-unit">OM content</div><span class="mc-delta d-g">↑ Good</span></div>
+    <div class="mc c-s"><div class="mc-lbl">ESTIMATED pH</div><div class="mc-val">6.2</div><div class="mc-unit">Spectral estimate</div><span class="mc-delta d-g">↑ Ideal</span></div>
+    <div class="mc c-w"><div class="mc-lbl">EROSION RISK</div><div class="mc-val">Low</div><div class="mc-unit">Slope + bare index</div><span class="mc-delta d-g">↓ Stable</span></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">🧪 Soil Parameters</div>
+      <table class="tbl"><thead><tr><th>Parameter</th><th>Value</th><th>Status</th><th>Optimal</th></tr></thead><tbody id="soilTbl"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-hd">💧 Moisture Distribution</div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="moistChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card mt1">
+    <div class="card-hd">🌿 NPK Status & Fertilizer Recommendation</div>
+    <div class="g2">
+      <div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:6px">Current NPK balance (spectral estimate)</div>
+        <div id="npkBars"></div>
+        <div style="margin-top:.8rem" id="fertRec"></div>
+      </div>
+      <div>
+        <div class="card-hd" style="font-size:12px">📋 Fertilizer Schedule</div>
+        <table class="tbl"><thead><tr><th>Nutrient</th><th>Product</th><th>Rate (kg/ha)</th><th>Timing</th></tr></thead><tbody id="fertTbl"></tbody></table>
+      </div>
+    </div>
+  </div>
+  <div class="card mt1"><div class="card-hd">⚠️ Soil Health Alerts</div><div id="soilAlerts"></div></div>
+</div>
+
+<!-- ═══ CROP COUNT & YIELD ═══ -->
+<div class="pg" id="page-cropcount">
+  <div class="pg-title">Crop Count & Yield Estimation</div>
+  <div class="pg-sub" id="cropCountSub">AI-powered crop detection · Plant counting · Yield modelling</div>
+  <div class="yield-grid" id="yieldGrid"></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">🔢 Plant Count by Zone</div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="countChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">📈 Yield Confidence Model</div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="yieldChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card mt1">
+    <div class="card-hd">🌾 Crop Health Distribution</div>
+    <table class="tbl"><thead><tr><th>Category</th><th>Count</th><th>% of Total</th><th>Avg NDVI</th><th>Est. Yield/Plant</th><th>Status</th></tr></thead><tbody id="cropDistTbl"></tbody></table>
+  </div>
+</div>
+
+<!-- ═══ WATER MANAGEMENT ═══ -->
+<div class="pg" id="page-water">
+  <div class="pg-title">Water Management</div>
+  <div class="pg-sub" id="waterSub">Irrigation scheduling · Soil moisture zones · Crop water requirements</div>
+  <div class="g4 mb1">
+    <div class="mc c-s"><div class="mc-lbl">SOIL MOISTURE</div><div class="mc-val">62%</div><div class="mc-unit">Field capacity</div><span class="mc-delta d-g">↑ OK</span></div>
+    <div class="mc c-g"><div class="mc-lbl">WATER DEFICIT</div><div class="mc-val">8mm</div><div class="mc-unit">Current deficit</div><span class="mc-delta d-n">→ Low</span></div>
+    <div class="mc c-e"><div class="mc-lbl">ET₀ (DAILY)</div><div class="mc-val">4.2mm</div><div class="mc-unit">Evapotranspiration</div><span class="mc-delta d-n">→ Moderate</span></div>
+    <div class="mc c-w"><div class="mc-lbl">NEXT IRRIGATION</div><div class="mc-val" id="nextIrr">5 days</div><div class="mc-unit">Based on forecast</div><span class="mc-delta d-g">↑ Scheduled</span></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd">💧 Irrigation Schedule</div>
+      <div id="irrSchedule"></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">🌧️ Rainfall vs Crop Water Need</div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="waterChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card mt1">
+    <div class="card-hd">🗺️ Soil Moisture Zone Map</div>
+    <div style="position:relative;width:100%;height:180px"><canvas id="moistZoneChart"></canvas></div>
+    <div id="waterRec" style="margin-top:.8rem"></div>
+  </div>
+</div>
+
+<!-- ═══ AI INSIGHTS ═══ -->
+<div class="pg" id="page-insights">
+  <div class="pg-title">AI-Powered Insights</div>
+  <div class="pg-sub">Claude · Kenya agronomic knowledge · KEPHIS · KALRO standards</div>
+  <div class="card mb1">
+    <div class="card-hd">💬 Ask About Your Farm</div>
+    <div class="flex-row mb1">
+      <input class="fc" id="aiQ" placeholder="e.g. What fertilizer should I apply for the phosphorus deficiency?" style="flex:1">
+      <button class="btn btn-p" onclick="askAI()">Ask AI ↗</button>
+    </div>
+    <div class="flex-row">
+      <button class="btn btn-o btn-s" onclick="qAsk('What fertilizer types and rates should I apply for '+state.crop+' in '+state.county+' this season?')">Fertilizer plan</button>
+      <button class="btn btn-o btn-s" onclick="qAsk('How many times per week should I water '+state.crop+' given current soil moisture of 62%?')">Watering schedule</button>
+      <button class="btn btn-o btn-s" onclick="qAsk('Estimate total crop count and expected yield for '+state.area+' ha of '+state.crop)">Yield estimate</button>
+      <button class="btn btn-o btn-s" onclick="qAsk('What diseases should I watch for in '+state.crop+' in '+state.season+'?')">Disease risks</button>
+      <button class="btn btn-o btn-s" onclick="qAsk('Compare this farm NDVI of 0.62 to typical Kenya benchmarks for '+state.crop)">Benchmarks</button>
+    </div>
+    <div id="aiOut" style="display:none">
+      <div class="ai-box">
+        <div class="ai-hd"><div class="ai-pulse"></div>AI ANALYSIS</div>
+        <div id="aiTxt"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="card-hd">🔍 Automated Findings</div><div id="autoFindings"></div></div>
+</div>
+
+<!-- ═══ REPORT ═══ -->
+<div class="pg" id="page-report">
+  <div class="pg-title">Farm Intelligence Report</div>
+  <div class="pg-sub">Comprehensive printable PDF report with imagery, indices, soil, yield & recommendations</div>
+  <div class="card mb1" id="reportDoc">
+    <div class="report-header">
+      <div>
+        <div class="report-watermark">AGROVISION KENYA · FARM INTELLIGENCE REPORT</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--g2)" id="rFarmName">Farm Report</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px" id="rMeta">—</div>
+      </div>
+      <div class="report-score">
+        <div style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace">FARM SCORE</div>
+        <div class="report-score-val">78</div>
+        <div class="report-score-sub">/ 100</div>
+      </div>
+    </div>
+    <div class="report-kpi">
+      <div class="rk"><div class="rk-lbl">NDVI</div><div class="rk-val" style="color:var(--g3)">0.62</div></div>
+      <div class="rk"><div class="rk-lbl">SOIL pH</div><div class="rk-val" style="color:var(--earth)">6.2</div></div>
+      <div class="rk"><div class="rk-lbl">YIELD FCST</div><div class="rk-val" style="color:var(--sky)">+12%</div></div>
+      <div class="rk"><div class="rk-lbl">CROP COUNT</div><div class="rk-val" id="rCropCount" style="color:var(--g2)">—</div></div>
+    </div>
+    <!-- Farm image in report -->
+    <div class="report-section">
+      <div class="rs-title">📸 Farm Aerial Imagery</div>
+      <div class="report-image-box" id="reportImageBox">
+        <canvas id="reportCanvas" style="width:100%;display:block;border-radius:7px"></canvas>
+        <div style="position:absolute;bottom:8px;right:10px;background:rgba(13,43,26,.8);color:#fff;font-size:9px;padding:3px 8px;border-radius:5px;font-family:'DM Mono',monospace" id="reportImgLabel">NDVI COMPOSITE</div>
+      </div>
+      <div id="reportMeasures"></div>
+    </div>
+    <div id="reportSections"></div>
+  </div>
+  <div class="report-actions">
+    <button class="btn btn-p" onclick="window.print()">🖨️ Print / Save PDF</button>
+    <button class="btn btn-o" onclick="generateReport()">🤖 Generate Full AI Report ↗</button>
+    <button class="btn btn-o" onclick="saveSession()">💾 Save Session</button>
+  </div>
+</div>
+
+</div><!-- end .main -->
+</div><!-- end .layout -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// ============================================================
+// ══════════════════════════════════════════════
 // CONFIG — Replace with your Anthropic API key
-// ============================================================
-const ANTHROPIC_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE';
-// ============================================================
+// ══════════════════════════════════════════════
+const ANTHROPIC_API_KEY = 'YOUR_KEY_HERE';
+// ══════════════════════════════════════════════
 
-let selectedCrop='Tea';
-let farmData={name:'Kiambu Tea Estate',county:'Kiambu',area:45,crop:'Tea',season:'Long Rains (Mar-Jun)',analysisRun:false};
-
-const cropProfiles={
-  Tea:{ndviOptimal:[0.55,0.85],phOptimal:[4.5,6.0],moistureOptimal:[60,75],diseases:['Blister blight','Red spider mite','Shot hole','Grey blight'],yieldUnit:'kg green leaf/ha',typicalYield:'3,000–5,000'},
-  Coffee:{ndviOptimal:[0.50,0.80],phOptimal:[6.0,6.5],moistureOptimal:[55,70],diseases:['Coffee berry disease','Leaf rust','Antestia bug','Wilt'],yieldUnit:'kg cherries/ha',typicalYield:'1,500–3,000'},
-  Maize:{ndviOptimal:[0.60,0.85],phOptimal:[5.5,7.0],moistureOptimal:[50,70],diseases:['Maize streak virus','Grey leaf spot','Striga','Fall armyworm'],yieldUnit:'t/ha',typicalYield:'2–8'},
-  Wheat:{ndviOptimal:[0.55,0.80],phOptimal:[6.0,7.0],moistureOptimal:[45,65],diseases:['Stem rust','Yellow rust','Septoria','Aphids'],yieldUnit:'t/ha',typicalYield:'2–5'},
-  Potatoes:{ndviOptimal:[0.45,0.75],phOptimal:[5.0,6.5],moistureOptimal:[60,75],diseases:['Late blight','Bacterial wilt','Potato virus Y','Nematodes'],yieldUnit:'t/ha',typicalYield:'15–35'},
-  Carrots:{ndviOptimal:[0.40,0.70],phOptimal:[6.0,7.0],moistureOptimal:[55,70],diseases:['Alternaria blight','Root-knot nematode','Carrot fly','Powdery mildew'],yieldUnit:'t/ha',typicalYield:'20–40'},
-  Sisal:{ndviOptimal:[0.35,0.65],phOptimal:[5.5,7.5],moistureOptimal:[30,50],diseases:['Zebra disease','Bole rot','Sisal weevil','Scale insects'],yieldUnit:'t dry fibre/ha',typicalYield:'1.5–2.5'},
-  Sunflower:{ndviOptimal:[0.50,0.75],phOptimal:[6.0,7.5],moistureOptimal:[45,65],diseases:['Downy mildew','Alternaria leaf spot','Sunflower moth','Aphids'],yieldUnit:'t/ha',typicalYield:'1.5–3'},
-  Pyrethrum:{ndviOptimal:[0.45,0.70],phOptimal:[5.5,6.5],moistureOptimal:[50,65],diseases:['Root rot','Leaf miner','Thrips','Grey mould'],yieldUnit:'kg dry flowers/ha',typicalYield:'400–800'},
-  Sorghum:{ndviOptimal:[0.45,0.75],phOptimal:[5.5,7.0],moistureOptimal:[35,55],diseases:['Sorghum midge','Covered kernel smut','Downy mildew','Striga'],yieldUnit:'t/ha',typicalYield:'1.5–4'},
-  Cotton:{ndviOptimal:[0.50,0.75],phOptimal:[5.8,7.0],moistureOptimal:[45,65],diseases:['Bollworm','Cotton stainer','Fusarium wilt','Jassids'],yieldUnit:'bales/ha',typicalYield:'1–3'},
-  Horticultural:{ndviOptimal:[0.50,0.80],phOptimal:[6.0,7.0],moistureOptimal:[60,75],diseases:['Botrytis','Whitefly','Pythium','Thrips'],yieldUnit:'t/ha',typicalYield:'15–50'}
+// ─── STATE ───
+let state = {
+  crop:'Tea', county:'Kiambu', area:45, season:'Long Rains (Mar–Jun)',
+  name:'Demo Farm', analysed:false, droneImage:null,
+  activeTool:'point', annotations:[], measurePoints:[],
+  selectedSats:['S2','SRTM'], sessions:[]
 };
 
-const viIndices=[
-  {name:'NDVI',full:'Normalised Difference Vegetation Index',value:0.62,range:[-1,1],goodRange:[0.4,1],color:'#2d7a4f'},
-  {name:'EVI',full:'Enhanced Vegetation Index',value:0.48,range:[0,1],goodRange:[0.3,0.8],color:'#1a6b3e'},
-  {name:'SAVI',full:'Soil-Adjusted Vegetation Index',value:0.54,range:[0,1],goodRange:[0.35,0.75],color:'#4caf79'},
-  {name:'NDRE',full:'Normalised Difference Red Edge',value:0.41,range:[-1,1],goodRange:[0.2,0.6],color:'#1976d2'},
-  {name:'GNDVI',full:'Green NDVI',value:0.58,range:[-1,1],goodRange:[0.3,0.8],color:'#0d47a1'},
-  {name:'MSAVI',full:'Modified SAVI',value:0.51,range:[-1,1],goodRange:[0.3,0.7],color:'#8b6914'},
-  {name:'RVI',full:'Ratio Vegetation Index',value:3.26,range:[0,10],goodRange:[2,6],color:'#e65100'},
-  {name:'OSAVI',full:'Optimised SAVI',value:0.56,range:[0,1],goodRange:[0.35,0.75],color:'#4527a0'},
-  {name:'CIre',full:'Red Edge Chlorophyll Index',value:1.84,range:[0,5],goodRange:[1,3],color:'#00838f'},
+// ─── CROP PROFILES ───
+const CP = {
+  Tea:{ndviOpt:[.55,.85],pH:[4.5,6.0],moist:[60,75],diseases:['Blister blight','Red spider mite','Shot hole','Grey blight'],yield:'3,000–5,000 kg/ha green leaf',yieldUnit:'kg green leaf',plantDensity:15000,waterNeed:1400,fertN:120,fertP:40,fertK:80,waterFreq:'Every 5–7 days during dry spells; no irrigation during long rains',waterDepth:'25–35mm per application'},
+  Coffee:{ndviOpt:[.50,.80],pH:[6.0,6.5],moist:[55,70],diseases:['Coffee berry disease','Leaf rust','Antestia bug','Wilt'],yield:'1,500–3,000 kg cherries/ha',yieldUnit:'kg cherries',plantDensity:1500,waterNeed:1200,fertN:100,fertP:60,fertK:120,waterFreq:'Every 7–10 days; critical at flowering and bean fill',waterDepth:'30–40mm per application'},
+  Maize:{ndviOpt:[.60,.85],pH:[5.5,7.0],moist:[50,70],diseases:['Maize streak virus','Grey leaf spot','Striga','Fall armyworm'],yield:'2–8 t/ha',yieldUnit:'tonnes',plantDensity:53000,waterNeed:500,fertN:180,fertP:60,fertK:60,waterFreq:'Every 3–5 days at knee-high; reduce after tasseling',waterDepth:'40–50mm per application'},
+  Wheat:{ndviOpt:[.55,.80],pH:[6.0,7.0],moist:[45,65],diseases:['Stem rust','Yellow rust','Septoria','Aphids'],yield:'2–5 t/ha',yieldUnit:'tonnes',plantDensity:3500000,waterNeed:450,fertN:120,fertP:60,fertK:40,waterFreq:'Every 7 days during grain fill; avoid waterlogging',waterDepth:'35–45mm per application'},
+  Rice:{ndviOpt:[.55,.80],pH:[5.5,6.5],moist:[75,95],diseases:['Rice blast','Brown plant hopper','Sheath blight','Bacterial leaf blight'],yield:'3–6 t/ha',yieldUnit:'tonnes',plantDensity:200000,waterNeed:1200,fertN:120,fertP:50,fertK:80,waterFreq:'Keep flooded 5cm deep until 2 weeks before harvest; drain periodically',waterDepth:'Maintain 3–5cm flood depth'},
+  Avocado:{ndviOpt:[.50,.80],pH:[6.0,7.0],moist:[55,70],diseases:['Phytophthora root rot','Anthracnose','Avocado lace bug','Thrips'],yield:'8–20 t/ha',yieldUnit:'tonnes',plantDensity:400,waterNeed:1000,fertN:80,fertP:40,fertK:120,waterFreq:'Every 10–14 days; critical at fruit development; avoid waterlogging',waterDepth:'40–60mm per application'},
+  Potatoes:{ndviOpt:[.45,.75],pH:[5.0,6.5],moist:[60,75],diseases:['Late blight','Bacterial wilt','Potato virus Y','Nematodes'],yield:'15–35 t/ha',yieldUnit:'tonnes',plantDensity:40000,waterNeed:500,fertN:160,fertP:80,fertK:200,waterFreq:'Every 4–6 days; critical at tuber initiation and bulking',waterDepth:'30–40mm per application'},
+  Carrots:{ndviOpt:[.40,.70],pH:[6.0,7.0],moist:[55,70],diseases:['Alternaria blight','Root-knot nematode','Carrot fly','Powdery mildew'],yield:'20–40 t/ha',yieldUnit:'tonnes',plantDensity:1000000,waterNeed:400,fertN:100,fertP:80,fertK:120,waterFreq:'Every 3–5 days; light frequent irrigation preferred',waterDepth:'20–30mm per application'},
+  Sisal:{ndviOpt:[.35,.65],pH:[5.5,7.5],moist:[30,50],diseases:['Zebra disease','Bole rot','Sisal weevil','Scale insects'],yield:'1.5–2.5 t dry fibre/ha',yieldUnit:'t dry fibre',plantDensity:3000,waterNeed:400,fertN:60,fertP:20,fertK:60,waterFreq:'Drought tolerant; irrigate only during establishment; 1x/month dry season',waterDepth:'50–70mm when irrigated'},
+  Sunflower:{ndviOpt:[.50,.75],pH:[6.0,7.5],moist:[45,65],diseases:['Downy mildew','Alternaria','Sunflower moth','Aphids'],yield:'1.5–3 t/ha',yieldUnit:'tonnes',plantDensity:55000,waterNeed:600,fertN:80,fertP:60,fertK:60,waterFreq:'Every 7–10 days; critical at flowering; reduce at seed fill',waterDepth:'40–50mm per application'},
+  Pyrethrum:{ndviOpt:[.45,.70],pH:[5.5,6.5],moist:[50,65],diseases:['Root rot','Leaf miner','Thrips','Grey mould'],yield:'400–800 kg dry flowers/ha',yieldUnit:'kg dry flowers',plantDensity:40000,waterNeed:800,fertN:80,fertP:40,fertK:60,waterFreq:'Every 7–10 days; overhead irrigation promotes flower development',waterDepth:'25–35mm per application'},
+  Sorghum:{ndviOpt:[.45,.75],pH:[5.5,7.0],moist:[35,55],diseases:['Sorghum midge','Smut','Downy mildew','Striga'],yield:'1.5–4 t/ha',yieldUnit:'tonnes',plantDensity:200000,waterNeed:500,fertN:100,fertP:40,fertK:40,waterFreq:'Every 7–10 days; drought tolerant; critical at panicle emergence',waterDepth:'35–45mm per application'},
+  Cotton:{ndviOpt:[.50,.75],pH:[5.8,7.0],moist:[45,65],diseases:['Bollworm','Cotton stainer','Fusarium wilt','Jassids'],yield:'1–3 bales/ha',yieldUnit:'bales',plantDensity:40000,waterNeed:700,fertN:60,fertP:30,fertK:30,waterFreq:'Every 7–10 days; critical at squaring and boll formation',waterDepth:'40–50mm per application'},
+  Horticultural:{ndviOpt:[.50,.80],pH:[6.0,7.0],moist:[60,75],diseases:['Botrytis','Whitefly','Pythium','Thrips'],yield:'15–50 t/ha',yieldUnit:'tonnes',plantDensity:80000,waterNeed:600,fertN:150,fertP:80,fertK:180,waterFreq:'Daily or every 2 days; drip irrigation recommended',waterDepth:'15–25mm per application'}
+};
+
+const VI_INDICES = [
+  {n:'NDVI',full:'Normalised Difference Vegetation Index',v:0.62,range:[-1,1],good:[.4,1],c:'#2d7a4f'},
+  {n:'EVI',full:'Enhanced Vegetation Index',v:0.48,range:[0,1],good:[.3,.8],c:'#1a6b3e'},
+  {n:'SAVI',full:'Soil-Adjusted Vegetation Index',v:0.54,range:[0,1],good:[.35,.75],c:'#4caf79'},
+  {n:'NDRE',full:'Normalised Difference Red Edge',v:0.41,range:[-1,1],good:[.2,.6],c:'#1976d2'},
+  {n:'GNDVI',full:'Green NDVI',v:0.58,range:[-1,1],good:[.3,.8],c:'#0d47a1'},
+  {n:'MSAVI',full:'Modified SAVI',v:0.51,range:[-1,1],good:[.3,.7],c:'#7a5c14'},
+  {n:'RVI',full:'Ratio Vegetation Index',v:3.26,range:[0,10],good:[2,6],c:'#bf4400'},
+  {n:'OSAVI',full:'Optimised SAVI',v:0.56,range:[0,1],good:[.35,.75],c:'#4527a0'},
+  {n:'CIre',full:'Red Edge Chlorophyll Index',v:1.84,range:[0,5],good:[1,3],c:'#00838f'},
 ];
 
-const soilTableData=[
-  {param:'Organic Matter',val:'3.8%',status:'Good',range:'3–5%',cls:'status-good'},
-  {param:'Estimated pH',val:'6.2',status:'Ideal',range:'6.0–6.5',cls:'status-good'},
-  {param:'Nitrogen (N)',val:'Medium',status:'Adequate',range:'Medium–High',cls:'status-ok'},
-  {param:'Phosphorus (P)',val:'Low-Med',status:'Monitor',range:'Medium',cls:'status-warn'},
-  {param:'Potassium (K)',val:'High',status:'Good',range:'Medium–High',cls:'status-good'},
-  {param:'Soil Moisture',val:'62%',status:'Optimal',range:'55–70%',cls:'status-good'},
-  {param:'Bulk Density',val:'1.28 g/cm³',status:'Normal',range:'1.1–1.4',cls:'status-ok'},
-  {param:'Texture Index',val:'Loam',status:'Ideal',range:'Loam–Clay loam',cls:'status-good'},
+const SOIL_DATA = [
+  {p:'Organic Matter',v:'3.8%',s:'Good',r:'3–5%',c:'p-g'},
+  {p:'Est. pH',v:'6.2',s:'Ideal',r:'6.0–6.5',c:'p-g'},
+  {p:'Nitrogen (N)',v:'Medium',s:'Adequate',r:'Medium–High',c:'p-s'},
+  {p:'Phosphorus (P)',v:'Low-Med',s:'Monitor',r:'Medium',c:'p-w'},
+  {p:'Potassium (K)',v:'High',s:'Good',r:'Med–High',c:'p-g'},
+  {p:'Soil Moisture',v:'62%',s:'Optimal',r:'55–70%',c:'p-g'},
+  {p:'Bulk Density',v:'1.28 g/cm³',s:'Normal',r:'1.1–1.4',c:'p-s'},
+  {p:'Texture',v:'Loam',s:'Ideal',r:'Loam–Clay loam',c:'p-g'},
 ];
 
-let zoneChart,moistChart,tempChart,rainChart;
+// ─── CHARTS (kept persistent) ───
+let charts={};
 
-function selectCrop(el,crop){document.querySelectorAll('.crop-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');selectedCrop=crop;farmData.crop=crop;document.getElementById('sessionCrop').textContent=crop;}
-
-function showPage(page){
-  document.querySelectorAll('.tab-content').forEach(p=>p.classList.remove('active'));
+// ─── NAVIGATION ───
+function nav(page) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('nav-'+page).classList.add('active');
-  if(page==='vegetation'&&farmData.analysisRun){renderVIGrid();renderVegCharts();}
-  if(page==='soil'&&farmData.analysisRun) renderSoilCharts();
-  if(page==='satellite'&&farmData.analysisRun) renderSatCharts();
-  if(page==='crophealth'&&farmData.analysisRun) renderCropHealth();
-  if(page==='insights'&&farmData.analysisRun) renderAutoFindings();
-  if(page==='report') populateReport();
+  document.getElementById('nv-'+page).classList.add('active');
+  if(state.analysed){
+    if(page==='vegetation') renderVeg();
+    if(page==='soil') renderSoil();
+    if(page==='cropcount') renderCropCount();
+    if(page==='water') renderWater();
+    if(page==='mapview') renderMap();
+    if(page==='insights') renderFindings();
+    if(page==='report') renderReport();
+  }
 }
 
-function handleFileUpload(e,type){
+// ─── CROP SELECT ───
+function selCrop(el,crop){
+  document.querySelectorAll('.cb').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  state.crop=crop;
+  document.getElementById('hdrCrop').textContent=crop;
+}
+
+// ─── SATELLITE TOGGLE ───
+function togSat(el,id){
+  el.classList.toggle('sel');
+  if(el.classList.contains('sel')){
+    if(!state.selectedSats.includes(id)) state.selectedSats.push(id);
+  } else {
+    state.selectedSats=state.selectedSats.filter(s=>s!==id);
+  }
+  const sum=document.getElementById('satSummary');
+  const txt=document.getElementById('satSummaryTxt');
+  if(state.selectedSats.length){
+    sum.style.display='flex';
+    txt.innerHTML=`<strong>${state.selectedSats.length} satellite source(s) active:</strong> ${state.selectedSats.join(', ')} — Will be fused with drone data during analysis.`;
+    document.getElementById('hdrSat').textContent=state.selectedSats.slice(0,2).join('+');
+  } else {
+    sum.style.display='none';
+    document.getElementById('hdrSat').textContent='No satellite';
+  }
+}
+
+// ─── FILE UPLOAD ───
+function handleUpload(e,type){
   const files=Array.from(e.target.files);
-  const container=document.getElementById(type==='drone'?'droneFiles':'satFiles');
-  container.innerHTML='';
-  files.forEach(f=>{const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f4f7f5;border-radius:6px;margin-bottom:6px;font-size:12px;color:var(--muted)';d.innerHTML=`<span style="color:var(--green-mid)">✓</span> ${f.name} <span style="margin-left:auto;font-family:DM Mono,monospace">${(f.size/1024).toFixed(0)} KB</span>`;container.appendChild(d);});
-  if(type==='drone') farmData.hasImage=true;
+  const cid=type==='drone'?'droneFiles':'satFiles';
+  const c=document.getElementById(cid);
+  c.innerHTML='';
+  files.forEach(f=>{
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:7px;padding:5px 9px;background:#f4f7f5;border-radius:6px;margin-bottom:5px;font-size:11.5px;color:var(--muted)';
+    d.innerHTML=`<span style="color:var(--g3)">✓</span>${f.name}<span style="margin-left:auto;font-family:DM Mono,monospace">${(f.size/1024).toFixed(0)}KB</span>`;
+    c.appendChild(d);
+    if(type==='drone' && f.type.startsWith('image/')){
+      const reader=new FileReader();
+      reader.onload=ev=>{state.droneImage=ev.target.result;};
+      reader.readAsDataURL(f);
+    }
+  });
 }
 
+// ─── RUN ANALYSIS ───
 function runAnalysis(){
-  farmData.name=document.getElementById('farmName').value||'Demo Farm';
-  farmData.county=document.getElementById('farmCounty').value||'Kiambu';
-  farmData.area=document.getElementById('farmArea').value||45;
-  farmData.season=document.getElementById('cropSeason').value||'Long Rains (Mar-Jun)';
-  farmData.crop=selectedCrop;
-  document.getElementById('sessionFarm').textContent=farmData.name;
-  document.getElementById('sessionCrop').textContent=farmData.crop;
-  const overlay=document.getElementById('loadingOverlay');
-  overlay.classList.add('show');
-  const steps=['step1','step2','step3','step4'];
-  const msgs=['Processing RGB bands...','Computing vegetation indices...','Running soil analysis...','Generating AI insights...'];
+  state.name=document.getElementById('farmName').value||'Demo Farm';
+  state.county=document.getElementById('farmCounty').value||'Kiambu';
+  state.area=parseFloat(document.getElementById('farmArea').value)||45;
+  state.season=document.getElementById('season').value||'Long Rains (Mar–Jun)';
+  document.getElementById('hdrFarm').textContent=state.name;
+  document.getElementById('hdrCrop').textContent=state.crop;
+
+  const ov=document.getElementById('loadOverlay');
+  ov.classList.add('on');
+  const steps=[['s1','Processing RGB bands...'],['s2','Computing 9 vegetation indices...'],['s3','Running soil & NPK analysis...'],['s4','Counting crops & modelling yield...'],['s5','Fusing '+state.selectedSats.join(', ')+' data...']];
   let i=0;
-  const t=setInterval(()=>{if(i<steps.length){document.getElementById(steps[i]).textContent='✓ '+msgs[i];i++;}else{clearInterval(t);overlay.classList.remove('show');farmData.analysisRun=true;showPage('vegetation');}},900);
+  const t=setInterval(()=>{
+    if(i<steps.length){document.getElementById(steps[i][0]).textContent='✓ '+steps[i][1];i++;}
+    else{clearInterval(t);ov.classList.remove('on');state.analysed=true;updateMeasures();nav('mapview');}
+  },800);
 }
 
-function getVIStatus(vi){const v=vi.value,lo=vi.goodRange[0],hi=vi.goodRange[1];if(v>=lo&&v<=hi) return{label:'Optimal',cls:'status-good'};if(v<lo) return{label:'Below Optimal',cls:'status-low'};return{label:'High',cls:'status-ok'};}
-
-function renderVIGrid(){
-  const grid=document.getElementById('viGrid');grid.innerHTML='';
-  document.getElementById('vi-crop-label').textContent=farmData.crop||'Tea';
-  viIndices.forEach(vi=>{const st=getVIStatus(vi);const range=vi.range[1]-vi.range[0];const pct=Math.max(0,Math.min(100,((vi.value-vi.range[0])/range)*100));grid.innerHTML+=`<div class="vi-card"><div class="vi-name">${vi.name}</div><div class="vi-value" style="color:${vi.color}">${vi.value}</div><div class="vi-bar"><div class="vi-fill" style="width:${pct}%;background:${vi.color}"></div></div><div style="font-size:11px;color:var(--muted);margin-bottom:6px">${vi.full}</div><span class="vi-status ${st.cls}">${st.label}</span></div>`;});
+// ─── UPDATE HEADER MEASURES ───
+function updateMeasures(){
+  const a=state.area;
+  document.getElementById('mTotalArea').textContent=a+' ha';
+  document.getElementById('mVegArea').textContent=(a*0.85).toFixed(1)+' ha';
+  document.getElementById('mStressArea').textContent=(a*0.12).toFixed(1)+' ha';
+  document.getElementById('mBareArea').textContent=(a*0.03).toFixed(1)+' ha';
+  document.getElementById('mRes').textContent='2.4 cm/px (120m altitude)';
 }
 
-function renderVegCharts(){
+// ─── MAP / ANNOTATION ENGINE ───
+let mapCtx, mapImg, annPoints=[], measurePts=[], drawingZone=false, zoneStart=null;
+
+function setTool(t){
+  state.activeTool=t;
+  document.querySelectorAll('.map-tool-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tool-'+t).classList.add('active');
+}
+
+function clearAnnotations(){annPoints=[];measurePts=[];drawCanvas();}
+
+function renderMap(){
+  const canvas=document.getElementById('mapCanvas');
+  const wrap=document.getElementById('mapWrap');
+  mapCtx=canvas.getContext('2d');
+  canvas.width=wrap.clientWidth||800;
+  canvas.height=Math.round(canvas.width*0.52);
+
+  // Draw base map (generated farm image)
+  drawCanvas();
+
+  canvas.onclick=function(e){
+    const rect=canvas.getBoundingClientRect();
+    const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    const x=(e.clientX-rect.left)*sx, y=(e.clientY-rect.top)*sy;
+    handleMapClick(x,y,canvas,e);
+  };
+  canvas.onmousemove=function(e){
+    const rect=canvas.getBoundingClientRect();
+    const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    const x=(e.clientX-rect.left)*sx, y=(e.clientY-rect.top)*sy;
+    handleMapHover(x,y,e,canvas);
+  };
+  canvas.onmouseleave=()=>{document.getElementById('annTooltip').style.display='none';};
+}
+
+function drawCanvas(){
+  const canvas=document.getElementById('mapCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+
+  if(state.droneImage){
+    const img=new Image();
+    img.onload=()=>{
+      ctx.drawImage(img,0,0,w,h);
+      if(state.activeTool==='ndvi') applyNDVIOverlay(ctx,w,h);
+      drawAnnotations(ctx);
+    };
+    img.src=state.droneImage;
+  } else {
+    drawSyntheticFarm(ctx,w,h);
+    if(state.activeTool==='ndvi') applyNDVIOverlay(ctx,w,h);
+    drawAnnotations(ctx);
+  }
+}
+
+function drawSyntheticFarm(ctx,w,h){
+  // Draw a realistic-looking synthetic farm
+  const colors=['#2d5a27','#3d7a35','#4a9e42','#5cb84e','#2a4820','#1e3818','#3a6832','#6ab558','#558c48','#4caf50','#88c975','#a5d688','#c2e5a0','#7ab548'];
+
+  // Background gradient
+  const bg=ctx.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,'#1e3818');bg.addColorStop(.5,'#2d5a27');bg.addColorStop(1,'#1a3014');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+
+  // Grid of crop rows
+  const cp=CP[state.crop]||CP.Tea;
+  const rows=Math.floor(h/18), cols=Math.floor(w/22);
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const noise=Math.random();
+      const x=c*22+(Math.random()-0.5)*4, y=r*18+(Math.random()-0.5)*3;
+      const health=noise>0.85?0:noise>0.75?1:noise>0.6?2:noise>0.1?3+Math.floor(Math.random()*5):8+Math.floor(Math.random()*4);
+      ctx.beginPath();
+      ctx.arc(x,y,noise>0.85?4:noise>0.75?3.5:2.5+(Math.random()*2),0,Math.PI*2);
+      ctx.fillStyle=colors[Math.min(health,colors.length-1)];
+      ctx.globalAlpha=0.7+Math.random()*0.3;
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha=1;
+
+  // Stressed patches
+  for(let i=0;i<4;i++){
+    const px=Math.random()*w*0.8+w*0.1, py=Math.random()*h*0.8+h*0.1;
+    const pr=20+Math.random()*40;
+    const grad=ctx.createRadialGradient(px,py,0,px,py,pr);
+    grad.addColorStop(0,'rgba(180,100,30,0.5)');
+    grad.addColorStop(1,'transparent');
+    ctx.fillStyle=grad;ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);ctx.fill();
+  }
+
+  // Paths/roads
+  ctx.strokeStyle='rgba(180,150,80,.4)';ctx.lineWidth=4;ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(w/3,0);ctx.lineTo(w/3,h);ctx.stroke();
+
+  // Water body
+  ctx.fillStyle='rgba(30,100,180,0.55)';ctx.beginPath();ctx.ellipse(w*0.82,h*0.18,35,20,0.3,0,Math.PI*2);ctx.fill();
+
+  // Labels on map
+  ctx.font='bold 11px DM Mono,monospace';ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.fillText('Zone A',12,20);ctx.fillText('Zone B',w/3+8,20);ctx.fillText('Zone C',w*0.66,20);
+  ctx.fillText('Zone D',12,h/2+16);ctx.fillText('Zone E',w/3+8,h/2+16);
+}
+
+function applyNDVIOverlay(ctx,w,h){
+  const id=ctx.getImageData(0,0,w,h);
+  const d=id.data;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const ndvi=(g-r)/(g+r+0.001);
+    let or,og,ob;
+    if(ndvi<0){or=139;og=0;ob=0;}
+    else if(ndvi<0.2){or=255;og=165;ob=0;}
+    else if(ndvi<0.4){or=255;og=255;ob=0;}
+    else if(ndvi<0.6){or=144;og=238;ob=100;}
+    else if(ndvi<0.8){or=0;og=128;ob=0;}
+    else{or=0;og=77;ob=0;}
+    d[i]=Math.round(r*0.3+or*0.7);d[i+1]=Math.round(g*0.3+og*0.7);d[i+2]=Math.round(b*0.3+ob*0.7);
+  }
+  ctx.putImageData(id,0,0);
+}
+
+function drawAnnotations(ctx){
+  annPoints.forEach(pt=>{
+    ctx.beginPath();
+    ctx.arc(pt.x,pt.y,7,0,Math.PI*2);
+    const c=pt.type==='stress'?'#e53935':pt.type==='water'?'#1976d2':pt.type==='zone'?'#ffa000':'#4caf79';
+    ctx.fillStyle=c+'cc';ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 9px DM Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(pt.label||'',pt.x,pt.y);
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  });
+  if(measurePts.length>1){
+    ctx.beginPath();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([5,4]);
+    ctx.moveTo(measurePts[0].x,measurePts[0].y);
+    measurePts.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.stroke();ctx.setLineDash([]);
+    // area label
+    if(measurePts.length>2){
+      const area=calcPolyArea(measurePts);
+      const cx=measurePts.reduce((s,p)=>s+p.x,0)/measurePts.length;
+      const cy=measurePts.reduce((s,p)=>s+p.y,0)/measurePts.length;
+      ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='bold 11px DM Sans,sans-serif';ctx.textAlign='center';
+      ctx.fillText(area.toFixed(2)+' ha',cx,cy);ctx.textAlign='left';
+    }
+  }
+}
+
+function calcPolyArea(pts){
+  const canvas=document.getElementById('mapCanvas');
+  if(!canvas||pts.length<3) return 0;
+  const pxPerMeter=Math.sqrt(state.area*10000)/(Math.min(canvas.width,canvas.height)*0.85);
+  let a=0;
+  for(let i=0;i<pts.length;i++){
+    const j=(i+1)%pts.length;
+    a+=pts[i].x*pts[j].y-pts[j].x*pts[i].y;
+  }
+  return Math.abs(a)*0.5*pxPerMeter*pxPerMeter/10000;
+}
+
+function handleMapClick(x,y,canvas,e){
+  if(state.activeTool==='measure'){
+    measurePts.push({x,y});
+    document.getElementById('mZoneArea').textContent=
+      measurePts.length>2?calcPolyArea(measurePts).toFixed(2)+' ha':'Add more points...';
+    drawCanvas();return;
+  }
+  if(state.activeTool==='zone'){
+    const zones=['A','B','C','D','E'];
+    const zn=zones[annPoints.length%zones.length];
+    annPoints.push({x,y,type:'zone',label:zn});
+    drawCanvas();return;
+  }
+  // Point analysis
+  const zoneInfo=getZoneInfo(x,y,canvas);
+  annPoints.push({x,y,type:zoneInfo.type,label:(annPoints.length+1).toString()});
+  drawCanvas();
+  renderZoneDetails(zoneInfo,x,y);
+}
+
+function handleMapHover(x,y,e,canvas){
+  const tip=document.getElementById('annTooltip');
+  if(state.activeTool!=='point'){tip.style.display='none';return;}
+  const info=getZoneInfo(x,y,canvas);
+  document.getElementById('annTitle').textContent=info.zone;
+  document.getElementById('annBody').innerHTML=
+    `<div style="color:#90d4a8;margin-bottom:3px">NDVI: <b>${info.ndvi}</b></div>`+
+    `<div>Health: <b>${info.health}</b></div>`+
+    `<div>Cover: <b>${info.cover}%</b></div>`+
+    `<div style="margin-top:4px;color:rgba(255,255,255,.7);font-size:10px">${info.note}</div>`;
+  const rect=canvas.getBoundingClientRect();
+  const tipX=e.clientX-rect.left+12, tipY=e.clientY-rect.top-60;
+  tip.style.left=Math.min(tipX,canvas.width-210)+'px';
+  tip.style.top=Math.max(tipY,5)+'px';
+  tip.style.display='block';
+}
+
+function getZoneInfo(x,y,canvas){
+  const w=canvas.width,h=canvas.height;
+  const zx=Math.floor(x/(w/3)), zy=Math.floor(y/(h/2));
+  const zones=[['Zone A','Zone B','Zone C'],['Zone D','Zone E','Zone F']];
+  const zn=zones[Math.min(zy,1)][Math.min(zx,2)];
+  const ndvis=[0.71,0.58,0.63,0.52,0.68,0.61];
+  const zi=(zy*3+zx)%ndvis.length;
+  const ndvi=ndvis[zi];
+  const health=ndvi>0.65?'Healthy':ndvi>0.5?'Moderate':'Stressed';
+  const type=ndvi>0.65?'healthy':ndvi>0.5?'moderate':'stress';
+  const notes=['Healthy canopy, optimal NDVI','Slight stress — check moisture','Stress detected — intervention needed','Optimal growth stage','Good canopy cover','Monitor for disease'];
+  return {zone:zn,ndvi:ndvi.toFixed(2),health,cover:Math.round(ndvi*100),note:notes[zi],type};
+}
+
+function renderZoneDetails(info,x,y){
+  const cp=CP[state.crop]||CP.Tea;
+  document.getElementById('zoneDetails').innerHTML=`
+    <div style="font-weight:600;font-size:13px;color:var(--g2);margin-bottom:.5rem">${info.zone} — Point Analysis</div>
+    <table class="tbl">
+      <tr><td class="text-muted">NDVI</td><td class="fw5 fmono">${info.ndvi}</td><td><span class="pill ${info.type==='healthy'?'p-g':info.type==='stress'?'p-r':'p-w'}">${info.health}</span></td></tr>
+      <tr><td class="text-muted">Canopy Cover</td><td class="fw5 fmono">${info.cover}%</td><td></td></tr>
+      <tr><td class="text-muted">Moisture Proxy</td><td class="fw5 fmono">${(55+Math.random()*25).toFixed(0)}%</td><td></td></tr>
+      <tr><td class="text-muted">Est. Plant Count</td><td class="fw5 fmono">${Math.round(cp.plantDensity*info.ndvi/10).toLocaleString()}/ha</td><td></td></tr>
+      <tr><td class="text-muted">Intervention</td><td class="fw5" colspan="2" style="color:var(--warn)">${info.type==='stress'?'Apply fungicide + irrigation':'Continue monitoring'}</td></tr>
+    </table>
+  `;
+}
+
+// ─── VEGETATION PAGE ───
+function renderVeg(){
+  document.getElementById('vegSub').textContent=`${state.crop} · ${state.county} · Satellite fusion: ${state.selectedSats.join(', ')}`;
+  const g=document.getElementById('viGrid');g.innerHTML='';
+  VI_INDICES.forEach(vi=>{
+    const range=vi.range[1]-vi.range[0];
+    const pct=Math.max(0,Math.min(100,((vi.v-vi.range[0])/range)*100));
+    const good=vi.v>=vi.good[0]&&vi.v<=vi.good[1];
+    const st=good?{lbl:'Optimal',cls:'p-g'}:vi.v<vi.good[0]?{lbl:'Below Optimal',cls:'p-e'}:{lbl:'High',cls:'p-s'};
+    g.innerHTML+=`<div class="vi-card"><div class="vi-nm">${vi.n}</div><div class="vi-val" style="color:${vi.c}">${vi.v}</div>
+      <div class="vi-bar"><div class="vi-fill" style="width:${pct}%;background:${vi.c}"></div></div>
+      <div class="vi-full">${vi.full}</div><span class="pill ${st.cls}">${st.lbl}</span></div>`;
+  });
   const ctx=document.getElementById('zoneChart').getContext('2d');
-  if(zoneChart) zoneChart.destroy();
-  zoneChart=new Chart(ctx,{type:'bar',data:{labels:['Zone A (N)','Zone B (S)','Zone C (E)','Zone D (W)','Zone E (C)'],datasets:[{label:'NDVI',data:[0.71,0.58,0.63,0.52,0.68],backgroundColor:'#2d7a4f99',borderColor:'#2d7a4f',borderWidth:1.5,borderRadius:4},{label:'EVI',data:[0.55,0.44,0.48,0.39,0.52],backgroundColor:'#1976d299',borderColor:'#1976d2',borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}},scales:{y:{beginAtZero:true,max:1,grid:{color:'#e8eceb'},ticks:{font:{size:11}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+  if(charts.zone) charts.zone.destroy();
+  charts.zone=new Chart(ctx,{type:'bar',data:{
+    labels:['Zone A','Zone B','Zone C','Zone D','Zone E'],
+    datasets:[
+      {label:'NDVI',data:[0.71,0.58,0.63,0.52,0.68],backgroundColor:'#2d7a4f99',borderColor:'#2d7a4f',borderWidth:1.5,borderRadius:4},
+      {label:'EVI',data:[0.55,0.44,0.48,0.39,0.52],backgroundColor:'#1976d299',borderColor:'#1976d2',borderWidth:1.5,borderRadius:4},
+      {label:'SAVI',data:[0.61,0.50,0.55,0.46,0.58],backgroundColor:'#bf440099',borderColor:'#bf4400',borderWidth:1.5,borderRadius:4},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:10}}},scales:{y:{min:0,max:1,grid:{color:'#e8eceb'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
 }
 
-function renderSoilCharts(){
-  const tbody=document.getElementById('soilTable');tbody.innerHTML='';
-  soilTableData.forEach(r=>{tbody.innerHTML+=`<tr><td style="font-weight:500">${r.param}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${r.val}</td><td><span class="vi-status ${r.cls}" style="font-size:11px">${r.status}</span></td><td style="color:var(--muted);font-size:12px">${r.range}</td></tr>`;});
-  const profile=cropProfiles[farmData.crop]||cropProfiles.Tea;
-  document.getElementById('soilAlerts').innerHTML=`<div class="alert alert-warn"><div class="alert-icon">⚠️</div><div><strong>Phosphorus deficiency detected</strong> — Low-medium P levels in eastern zones. Recommend DAP 200kg/ha before next rains. ${farmData.crop} is sensitive to P deficiency during early growth.</div></div><div class="alert alert-success"><div class="alert-icon">✅</div><div><strong>Soil moisture adequate</strong> — Current moisture at 62% is within optimal range for ${farmData.crop} (${profile.moistureOptimal[0]}–${profile.moistureOptimal[1]}%). No irrigation needed in next 5–7 days.</div></div><div class="alert alert-danger"><div class="alert-icon">🔴</div><div><strong>Compaction risk in Zone D</strong> — Elevated bulk density detected in western zone. Deep tillage recommended to improve root penetration and water infiltration.</div></div>`;
-  const mctx=document.getElementById('moistureChart').getContext('2d');
-  if(moistChart) moistChart.destroy();
-  moistChart=new Chart(mctx,{type:'doughnut',data:{labels:['High moisture','Optimal','Low moisture','Dry'],datasets:[{data:[18,55,20,7],backgroundColor:['#1976d2','#2d7a4f','#f5e6c0','#c62828'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}}}});
+// ─── SOIL PAGE ───
+function renderSoil(){
+  const cp=CP[state.crop]||CP.Tea;
+  const tb=document.getElementById('soilTbl');tb.innerHTML='';
+  SOIL_DATA.forEach(r=>{
+    tb.innerHTML+=`<tr><td class="fw5">${r.p}</td><td class="fmono" style="font-size:11px">${r.v}</td><td><span class="pill ${r.c}">${r.s}</span></td><td class="text-muted">${r.r}</td></tr>`;
+  });
+  // NPK bars
+  const npkEl=document.getElementById('npkBars');
+  const nPct=Math.round(cp.fertN/3), pPct=Math.round(cp.fertP/2), kPct=Math.round(cp.fertK/2.5);
+  npkEl.innerHTML=`
+    <div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span class="fw5">Nitrogen (N)</span><span class="fmono">${cp.fertN}kg/ha needed</span></div>
+    <div class="npk-bar"><div class="npk-seg" style="width:${Math.round(nPct*0.6)}%;background:#1a6b3e;min-width:20px">Current</div><div class="npk-seg" style="width:${Math.round(nPct*0.4)}%;background:#bf4400;min-width:20px">Deficit</div></div></div>
+    <div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span class="fw5">Phosphorus (P)</span><span class="fmono">${cp.fertP}kg/ha needed</span></div>
+    <div class="npk-bar"><div class="npk-seg" style="width:${Math.round(pPct*0.4)}%;background:#0d4790;min-width:20px">Current</div><div class="npk-seg" style="width:${Math.round(pPct*0.6)}%;background:#bf4400;min-width:20px">Deficit</div></div></div>
+    <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span class="fw5">Potassium (K)</span><span class="fmono">${cp.fertK}kg/ha needed</span></div>
+    <div class="npk-bar"><div class="npk-seg" style="width:${Math.round(kPct*0.75)}%;background:#2d7a4f;min-width:20px">Current</div><div class="npk-seg" style="width:${Math.round(kPct*0.25)}%;background:#bf4400;min-width:20px">Deficit</div></div></div>`;
+
+  // Fertilizer recommendation
+  document.getElementById('fertRec').innerHTML=`
+    <div class="al al-w"><div class="al-ico">🟡</div><div><strong>Phosphorus deficiency detected.</strong> Apply DAP (18-46-0) at ${Math.round(cp.fertP*2.5)}kg/ha in eastern zones before next rains. Split application recommended.</div></div>
+    <div class="al al-g"><div class="al-ico">✅</div><div><strong>Potassium adequate.</strong> Apply MOP at ${Math.round(cp.fertK*1.2)}kg/ha as top-dress at active growth stage for ${state.crop}.</div></div>
+    <div class="al al-s"><div class="al-ico">ℹ️</div><div><strong>Nitrogen timing.</strong> Apply CAN (26% N) at ${Math.round(cp.fertN*0.6)}kg/ha base + ${Math.round(cp.fertN*0.4)}kg/ha top-dress 6 weeks later.</div></div>`;
+
+  // Fertilizer schedule table
+  const fb=document.getElementById('fertTbl');fb.innerHTML=`
+    <tr><td>Nitrogen</td><td>CAN (26-0-0)</td><td>${cp.fertN}</td><td>Split: planting + 6wk</td></tr>
+    <tr><td>Phosphorus</td><td>DAP (18-46-0)</td><td>${cp.fertP}</td><td>At planting (basal)</td></tr>
+    <tr><td>Potassium</td><td>MOP (0-0-60)</td><td>${cp.fertK}</td><td>Top-dress at growth</td></tr>
+    <tr><td>Micronutrients</td><td>Zincmaster / Borax</td><td>10–15</td><td>Foliar spray monthly</td></tr>
+    <tr><td>Organic</td><td>Compost / FYM</td><td>5,000 kg/ha</td><td>Before planting</td></tr>`;
+
+  // Soil alerts
+  document.getElementById('soilAlerts').innerHTML=`
+    <div class="al al-w"><div class="al-ico">⚠️</div><div><strong>Phosphorus Low in Eastern Zones</strong> — Spectral P index below threshold. Apply DAP ${cp.fertP*2}kg/ha before ${state.season.includes('Long')?'March':'October'} rains. ${state.crop} shows P sensitivity during early growth.</div></div>
+    <div class="al al-g"><div class="al-ico">✅</div><div><strong>Soil Moisture Adequate</strong> — 62% field capacity is within optimal range for ${state.crop} (${cp.moist[0]}–${cp.moist[1]}%). No irrigation required for 5–7 days.</div></div>
+    <div class="al al-r"><div class="al-ico">🔴</div><div><strong>Compaction Risk in Zone D</strong> — Elevated bulk density (>1.4g/cm³) detected. Deep ripping at 40cm recommended. Affects root penetration and water infiltration for ${state.crop}.</div></div>`;
+
+  // Moisture chart
+  const mc=document.getElementById('moistChart').getContext('2d');
+  if(charts.moist) charts.moist.destroy();
+  charts.moist=new Chart(mc,{type:'doughnut',data:{labels:['High (>75%)','Optimal (55–75%)','Low (35–55%)','Dry (<35%)'],datasets:[{data:[18,55,20,7],backgroundColor:['#1565c0','#2d7a4f','#f0e0a0','#c62828'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:10}}}}});
 }
 
-function renderSatCharts(){
+// ─── CROP COUNT & YIELD ───
+function renderCropCount(){
+  const cp=CP[state.crop]||CP.Tea;
+  document.getElementById('cropCountSub').textContent=`${state.crop} · ${state.area}ha · ${state.county}`;
+  const totalPlants=Math.round(cp.plantDensity*state.area);
+  const healthyPct=0.78, modPct=0.14, stressPct=0.08;
+  const healthyN=Math.round(totalPlants*healthyPct), modN=Math.round(totalPlants*modPct), stressN=Math.round(totalPlants*stressPct);
+  const yieldPerPlant=cp.plantDensity>10000?0.15:cp.plantDensity>1000?2.5:15;
+  const estYield=Math.round(totalPlants*healthyPct*yieldPerPlant/1000);
+
+  document.getElementById('rCropCount').textContent=totalPlants.toLocaleString();
+  const yg=document.getElementById('yieldGrid');
+  yg.innerHTML=`
+    <div class="yc"><div class="yc-val">${totalPlants.toLocaleString()}</div><div class="yc-lbl">TOTAL PLANTS</div></div>
+    <div class="yc"><div class="yc-val">${healthyN.toLocaleString()}</div><div class="yc-lbl">HEALTHY PLANTS</div></div>
+    <div class="yc"><div class="yc-val">${stressN.toLocaleString()}</div><div class="yc-lbl">STRESSED PLANTS</div></div>
+    <div class="yc"><div class="yc-val">${estYield.toLocaleString()} t</div><div class="yc-lbl">EST. TOTAL YIELD</div></div>
+    <div class="yc"><div class="yc-val">${(estYield/state.area).toFixed(1)}</div><div class="yc-lbl">YIELD/HA (${cp.yieldUnit})</div></div>
+    <div class="yc"><div class="yc-val">${(healthyPct*100).toFixed(0)}%</div><div class="yc-lbl">HARVEST READY</div></div>`;
+
+  const cc=document.getElementById('countChart').getContext('2d');
+  if(charts.count) charts.count.destroy();
+  const pd=Math.round(cp.plantDensity/10);
+  charts.count=new Chart(cc,{type:'bar',data:{labels:['Zone A','Zone B','Zone C','Zone D','Zone E'],datasets:[{label:'Healthy',data:[pd*2.1,pd*1.5,pd*1.8,pd*1.2,pd*2.0].map(Math.round),backgroundColor:'#2d7a4f99',borderColor:'#2d7a4f',borderWidth:1.5,borderRadius:4},{label:'Stressed',data:[pd*0.3,pd*0.5,pd*0.4,pd*0.7,pd*0.3].map(Math.round),backgroundColor:'#bf440099',borderColor:'#bf4400',borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{y:{beginAtZero:true,stacked:false,grid:{color:'#e8eceb'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  const yc=document.getElementById('yieldChart').getContext('2d');
+  if(charts.yield) charts.yield.destroy();
+  charts.yield=new Chart(yc,{type:'line',data:{labels:['Current','Optimal fert.','Optimal water','Full intervention'],datasets:[{label:'Yield (t/ha)',data:[estYield/state.area,(estYield/state.area)*1.15,(estYield/state.area)*1.12,(estYield/state.area)*1.28].map(v=>+v.toFixed(2)),borderColor:'#2d7a4f',backgroundColor:'#2d7a4f22',fill:true,tension:.4,pointRadius:5,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#e8eceb'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  const dtbl=document.getElementById('cropDistTbl');
+  dtbl.innerHTML=`
+    <tr><td>🟢 Healthy</td><td class="fmono">${healthyN.toLocaleString()}</td><td>${(healthyPct*100).toFixed(0)}%</td><td>0.65–0.85</td><td>${(yieldPerPlant*1.05).toFixed(2)} ${cp.yieldUnit}/plant</td><td><span class="pill p-g">Optimal</span></td></tr>
+    <tr><td>🟡 Moderate</td><td class="fmono">${modN.toLocaleString()}</td><td>${(modPct*100).toFixed(0)}%</td><td>0.45–0.64</td><td>${(yieldPerPlant*0.75).toFixed(2)} ${cp.yieldUnit}/plant</td><td><span class="pill p-w">Monitor</span></td></tr>
+    <tr><td>🔴 Stressed</td><td class="fmono">${stressN.toLocaleString()}</td><td>${(stressPct*100).toFixed(0)}%</td><td>&lt;0.44</td><td>${(yieldPerPlant*0.4).toFixed(2)} ${cp.yieldUnit}/plant</td><td><span class="pill p-r">Intervene</span></td></tr>`;
+}
+
+// ─── WATER MANAGEMENT ───
+function renderWater(){
+  const cp=CP[state.crop]||CP.Tea;
+  document.getElementById('waterSub').textContent=`${state.crop} · Annual water need: ${cp.waterNeed}mm · ${state.county}`;
+  document.getElementById('nextIrr').textContent=cp.waterNeed>1200?'3 days':cp.waterNeed>700?'5 days':'7 days';
+
+  const irrEl=document.getElementById('irrSchedule');
+  const freq=cp.waterFreq, depth=cp.waterDepth;
+  irrEl.innerHTML=`
+    <div class="al al-s mb1"><div class="al-ico">💧</div><div><strong>Irrigation Frequency:</strong> ${freq}</div></div>
+    <div class="al al-g mb1"><div class="al-ico">📏</div><div><strong>Application Depth:</strong> ${depth}</div></div>
+    <table class="tbl"><thead><tr><th>Stage</th><th>Frequency</th><th>Amount</th><th>Method</th></tr></thead><tbody>
+      <tr><td>Establishment</td><td>Daily</td><td>20–25mm</td><td>Drip/overhead</td></tr>
+      <tr><td>Vegetative</td><td>${cp.waterNeed>1000?'Every 3–5 days':'Every 5–7 days'}</td><td>${depth}</td><td>Furrow/drip</td></tr>
+      <tr><td>Flowering/Fruiting</td><td>Critical stage — do not skip</td><td>+20% normal rate</td><td>Drip preferred</td></tr>
+      <tr><td>Maturity</td><td>Reduce by 30%</td><td>Lower volume</td><td>Any method</td></tr>
+    </tbody></table>
+    <div class="al al-w" style="margin-top:.8rem"><div class="al-ico">⚠️</div><div><strong>Waterlogging Warning:</strong> ${state.crop==='Rice'?'Maintain 3–5cm flood — check daily.':'Avoid waterlogging; '+state.crop+' is susceptible to root rot in saturated soils.'}</div></div>`;
+
+  const wc=document.getElementById('waterChart').getContext('2d');
+  if(charts.water) charts.water.destroy();
   const months=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
-  const tctx=document.getElementById('temporalChart').getContext('2d');
-  if(tempChart) tempChart.destroy();
-  tempChart=new Chart(tctx,{type:'line',data:{labels:months,datasets:[{label:'Drone NDVI',data:[0.55,0.62,0.68,0.65,0.60,0.58,0.64,0.70,0.67,0.63,0.60,0.65],borderColor:'#2d7a4f',backgroundColor:'#2d7a4f22',tension:.4,fill:true,pointRadius:3},{label:'Sentinel-2 NDVI',data:[0.52,0.60,0.65,0.62,0.57,0.55,0.61,0.67,0.64,0.61,0.57,0.62],borderColor:'#1976d2',backgroundColor:'transparent',tension:.4,borderDash:[5,3],pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}},scales:{y:{min:0.3,max:0.9,grid:{color:'#e8eceb'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
-  const rctx=document.getElementById('rainfallChart').getContext('2d');
-  if(rainChart) rainChart.destroy();
-  rainChart=new Chart(rctx,{type:'bar',data:{labels:months,datasets:[{type:'bar',label:'Rainfall (mm)',data:[85,175,195,60,30,25,80,150,120,95,65,40],backgroundColor:'#1976d240',borderColor:'#1976d2',borderWidth:1,yAxisID:'y1',borderRadius:3},{type:'line',label:'NDVI',data:[0.55,0.62,0.68,0.65,0.60,0.58,0.64,0.70,0.67,0.63,0.60,0.65],borderColor:'#2d7a4f',backgroundColor:'transparent',tension:.4,pointRadius:3,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}},scales:{y1:{position:'left',grid:{color:'#e8eceb'},ticks:{font:{size:10}}},y2:{position:'right',min:0.3,max:0.9,grid:{display:false},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  const rain=[85,175,195,60,30,25,80,150,120,95,65,40];
+  const need=months.map((_,i)=>Math.round(cp.waterNeed/12*(1+0.4*Math.sin(i/2))));
+  charts.water=new Chart(wc,{type:'bar',data:{labels:months,datasets:[
+    {type:'bar',label:'Rainfall (mm)',data:rain,backgroundColor:'#1976d240',borderColor:'#1976d2',borderWidth:1,borderRadius:3,yAxisID:'y1'},
+    {type:'line',label:'Crop Need (mm)',data:need,borderColor:'#2d7a4f',backgroundColor:'transparent',tension:.4,pointRadius:3,yAxisID:'y1',borderWidth:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{y1:{grid:{color:'#e8eceb'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  const mz=document.getElementById('moistZoneChart').getContext('2d');
+  if(charts.moistZone) charts.moistZone.destroy();
+  charts.moistZone=new Chart(mz,{type:'bar',data:{labels:['Zone A','Zone B','Zone C','Zone D','Zone E'],datasets:[{label:'Soil Moisture %',data:[68,55,62,48,72],backgroundColor:['#2d7a4f','#bf4400','#2d7a4f','#e53935','#1976d2'],borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,grid:{color:'#e8eceb'},ticks:{font:{size:10},callback:v=>v+'%'}},x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+  document.getElementById('waterRec').innerHTML=`
+    <div class="al al-r"><div class="al-ico">🔴</div><div><strong>Zone D Critical:</strong> Soil moisture at 48% — below threshold of ${cp.moist[0]}%. Irrigate Zone D immediately with ${depth}. Check for drainage obstruction.</div></div>
+    <div class="al al-g"><div class="al-ico">✅</div><div><strong>Zones A, C, E:</strong> Moisture adequate. Next irrigation in ${cp.waterNeed>1000?'3–4':'5–7'} days depending on forecast rainfall.</div></div>`;
 }
 
-function renderCropHealth(){
-  const profile=cropProfiles[farmData.crop]||cropProfiles.Tea;
-  document.getElementById('cropHealthSub').textContent=`${farmData.crop} · ${farmData.county} · ${farmData.season}`;
-  const stages=document.getElementById('growthStages');
-  stages.innerHTML='';
-  [{name:'Vegetative',pct:100},{name:'Canopy Closure',pct:85},{name:'Active Growth',pct:72},{name:'Maturity',pct:67}].forEach(s=>{stages.innerHTML+=`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>${s.name}</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${s.pct}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${s.pct}%;background:var(--green-mid)"></div></div></div>`;});
-  const risks=document.getElementById('diseaseRisks');risks.innerHTML='';
-  profile.diseases.forEach((d,i)=>{const risk=['High','Medium','Low','Low'][i]||'Low';const cls=['alert-danger','alert-warn','alert-success','alert-success'][i]||'alert-success';risks.innerHTML+=`<div class="alert ${cls}" style="margin-bottom:6px"><div class="alert-icon">${['🔴','🟡','🟢','🟢'][i]}</div><div><strong>${d}</strong> — ${risk} risk based on current canopy density and moisture levels.</div></div>`;});
-  document.getElementById('actionTimeline').innerHTML=`<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Immediate (0–7 days)</div><div class="timeline-sub">Apply fungicide in Zone B · Scout for ${profile.diseases[0]}</div></div><div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Short term (7–14 days)</div><div class="timeline-sub">Top-dress with CAN fertilizer 150kg/ha · Address phosphorus deficiency</div></div><div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Medium term (14–30 days)</div><div class="timeline-sub">Deep tillage in Zone D · Collect soil samples for lab verification</div></div><div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-title">Seasonal (30–90 days)</div><div class="timeline-sub">Prepare harvest readiness assessment · Plan crop rotation</div></div>`;
+// ─── AUTO FINDINGS ───
+function renderFindings(){
+  const cp=CP[state.crop]||CP.Tea;
+  document.getElementById('autoFindings').innerHTML=`
+    <div class="al al-g"><div class="al-ico">🟢</div><div><strong>NDVI above county average.</strong> Score of 0.62 exceeds ${state.county} average of 0.57 for ${state.crop}. Farm management is above regional benchmark.</div></div>
+    <div class="al al-w"><div class="al-ico">🟡</div><div><strong>Phosphorus deficiency in 18% of area.</strong> Low spectral P in eastern zones. Apply DAP ${cp.fertP*2}kg/ha. ${state.crop} is highly sensitive to P at current growth stage.</div></div>
+    <div class="al al-r"><div class="al-ico">🔴</div><div><strong>Early stress in Zone B.</strong> NDVI dropped 0.09 since last ${state.selectedSats[0]||'Sentinel-2'} pass. High risk of ${cp.diseases[0]}. Apply fungicide within 7 days.</div></div>
+    <div class="al al-g"><div class="al-ico">🟢</div><div><strong>Irrigation not required for ${cp.waterNeed>1200?'3–4':'5–7'} days.</strong> Satellite soil moisture confirms adequate field capacity in 78% of farm.</div></div>
+    <div class="al al-s"><div class="al-ico">ℹ️</div><div><strong>Satellite fusion active:</strong> ${state.selectedSats.join(', ')} data integrated. Temporal NDVI from ${state.selectedSats[0]||'Sentinel-2'} shows consistent positive trend over 90 days.</div></div>
+    <div class="al al-g"><div class="al-ico">🟢</div><div><strong>Topography favorable.</strong> SRTM confirms south-east aspect at 1,842m ASL — optimal for ${state.crop} in Kenyan highlands. Drainage classified as Good.</div></div>`;
 }
 
-function renderAutoFindings(){
-  const profile=cropProfiles[farmData.crop]||cropProfiles.Tea;
-  document.getElementById('autoFindings').innerHTML=`<div class="alert alert-success"><div class="alert-icon">🟢</div><div><strong>Vegetation health above county average.</strong> NDVI of 0.62 exceeds the ${farmData.county} county average of 0.57 for ${farmData.crop}.</div></div><div class="alert alert-warn"><div class="alert-icon">🟡</div><div><strong>Phosphorus deficiency in 18% of farm area.</strong> Spectral analysis shows low P signatures in eastern and north-western zones.</div></div><div class="alert alert-danger"><div class="alert-icon">🔴</div><div><strong>Early stress signal in Zone B (south).</strong> NDVI dropped 0.09 points vs. last satellite pass. Monitor for ${profile.diseases[0]}.</div></div><div class="alert alert-success"><div class="alert-icon">🟢</div><div><strong>Irrigation not required for 5–7 days.</strong> Soil moisture index at 62% is within optimal bounds.</div></div><div class="alert alert-success"><div class="alert-icon">🟢</div><div><strong>Topography favorable.</strong> South-east aspect at 1,842m elevation is ideal for ${farmData.crop} production in Kenyan highlands.</div></div>`;
-}
-
-function populateReport(){
+// ─── REPORT ───
+function renderReport(){
+  const cp=CP[state.crop]||CP.Tea;
   const d=new Date();
-  document.getElementById('reportFarmName').textContent=(farmData.name||'Farm')+' — Analysis Report';
-  document.getElementById('reportMeta').textContent=`Generated: ${d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Crop: ${farmData.crop} · Season: ${farmData.season} · Area: ${farmData.area} ha`;
-  const profile=cropProfiles[farmData.crop]||cropProfiles.Tea;
-  document.getElementById('reportSections').innerHTML=`<h3 style="font-family:'Syne',sans-serif;font-size:14px;color:var(--green-dark);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)">1. Vegetation Index Summary</h3><table class="table" style="margin-bottom:1.5rem"><thead><tr><th>Index</th><th>Value</th><th>Status</th><th>Description</th></tr></thead><tbody><tr><td>NDVI</td><td>0.62</td><td><span class="vi-status status-good">Optimal</span></td><td>Good vegetation density, healthy chlorophyll</td></tr><tr><td>EVI</td><td>0.48</td><td><span class="vi-status status-good">Optimal</span></td><td>Corrected for atmospheric and canopy background</td></tr><tr><td>SAVI</td><td>0.54</td><td><span class="vi-status status-good">Optimal</span></td><td>Soil-adjusted; accounts for partial canopy areas</td></tr><tr><td>NDRE</td><td>0.41</td><td><span class="vi-status status-ok">Good</span></td><td>Nitrogen and chlorophyll stress indicator</td></tr><tr><td>GNDVI</td><td>0.58</td><td><span class="vi-status status-good">Optimal</span></td><td>Green-band NDVI; sensitive to chlorophyll content</td></tr></tbody></table><h3 style="font-family:'Syne',sans-serif;font-size:14px;color:var(--green-dark);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)">2. Soil Analysis</h3><table class="table" style="margin-bottom:1.5rem"><thead><tr><th>Parameter</th><th>Value</th><th>Status</th><th>Recommendation</th></tr></thead><tbody><tr><td>Organic Matter</td><td>3.8%</td><td><span class="vi-status status-good">Good</span></td><td>Maintain with compost application</td></tr><tr><td>Estimated pH</td><td>6.2</td><td><span class="vi-status status-good">Ideal</span></td><td>No liming required</td></tr><tr><td>Phosphorus</td><td>Low-Med</td><td><span class="vi-status status-warn">Monitor</span></td><td>Apply DAP 200kg/ha in eastern zones</td></tr><tr><td>Soil Moisture</td><td>62%</td><td><span class="vi-status status-good">Optimal</span></td><td>No irrigation needed 5–7 days</td></tr></tbody></table><h3 style="font-family:'Syne',sans-serif;font-size:14px;color:var(--green-dark);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)">3. Crop Health & Disease Risk</h3><table class="table" style="margin-bottom:1.5rem"><thead><tr><th>Condition</th><th>Risk Level</th><th>Action Required</th></tr></thead><tbody><tr><td>${profile.diseases[0]}</td><td><span class="vi-status status-warn">High Risk</span></td><td>Apply fungicide in Zone B within 7 days</td></tr><tr><td>${profile.diseases[1]}</td><td><span class="vi-status status-ok">Medium</span></td><td>Scout weekly, prepare miticide</td></tr><tr><td>${profile.diseases[2]}</td><td><span class="vi-status status-good">Low</span></td><td>Continue routine monitoring</td></tr></tbody></table><h3 style="font-family:'Syne',sans-serif;font-size:14px;color:var(--green-dark);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)">4. Priority Interventions</h3><div class="alert alert-danger" style="margin-bottom:8px"><div class="alert-icon">🔴</div><div><strong>P1 — Immediate:</strong> Fungicide application Zone B · Scout for ${profile.diseases[0]}</div></div><div class="alert alert-warn" style="margin-bottom:8px"><div class="alert-icon">🟡</div><div><strong>P2 — 7 days:</strong> Top-dress with CAN 150kg/ha · Address phosphorus with DAP 200kg/ha</div></div><div class="alert alert-success" style="margin-bottom:8px"><div class="alert-icon">🟢</div><div><strong>P3 — 14–30 days:</strong> Deep tillage Zone D · Collect physical soil samples for lab confirmation</div></div>`;
+  document.getElementById('rFarmName').textContent=(state.name||'Farm')+' — Farm Intelligence Report';
+  document.getElementById('rMeta').textContent=`Generated: ${d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Crop: ${state.crop} · Season: ${state.season} · Area: ${state.area}ha · County: ${state.county} · Satellites: ${state.selectedSats.join(', ')}`;
+
+  const totalPlants=Math.round(cp.plantDensity*state.area);
+
+  // Copy farm image to report canvas
+  const src=document.getElementById('mapCanvas');
+  const dst=document.getElementById('reportCanvas');
+  if(src && src.width>0){
+    dst.width=src.width;dst.height=src.height;
+    dst.getContext('2d').drawImage(src,0,0);
+  }
+
+  document.getElementById('reportMeasures').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:7px;overflow:hidden;margin-top:.8rem">
+      <div style="background:white;padding:.5rem;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:DM Mono,monospace">TOTAL AREA</div><div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700">${state.area}ha</div></div>
+      <div style="background:white;padding:.5rem;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:DM Mono,monospace">VEGETATED</div><div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--g3)">${(state.area*0.85).toFixed(1)}ha</div></div>
+      <div style="background:white;padding:.5rem;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:DM Mono,monospace">STRESSED</div><div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--warn)">${(state.area*0.12).toFixed(1)}ha</div></div>
+      <div style="background:white;padding:.5rem;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:DM Mono,monospace">BARE SOIL</div><div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--earth)">${(state.area*0.03).toFixed(1)}ha</div></div>
+    </div>`;
+
+  document.getElementById('reportSections').innerHTML=`
+    <div class="report-section">
+      <div class="rs-title">1. Vegetation Index Summary</div>
+      <table class="tbl"><thead><tr><th>Index</th><th>Value</th><th>Status</th><th>Interpretation</th></tr></thead><tbody>
+        <tr><td>NDVI</td><td class="fmono">0.62</td><td><span class="pill p-g">Optimal</span></td><td>Good chlorophyll density — healthy canopy</td></tr>
+        <tr><td>EVI</td><td class="fmono">0.48</td><td><span class="pill p-g">Optimal</span></td><td>Atmospheric-corrected; confirms NDVI result</td></tr>
+        <tr><td>SAVI</td><td class="fmono">0.54</td><td><span class="pill p-g">Optimal</span></td><td>Soil-adjusted; reliable in partial cover zones</td></tr>
+        <tr><td>NDRE</td><td class="fmono">0.41</td><td><span class="pill p-s">Good</span></td><td>Red-edge N/chlorophyll indicator — monitor</td></tr>
+        <tr><td>GNDVI</td><td class="fmono">0.58</td><td><span class="pill p-g">Optimal</span></td><td>Green-band chlorophyll content — good</td></tr>
+      </tbody></table>
+    </div>
+    <div class="report-section">
+      <div class="rs-title">2. Crop Count & Yield Estimation</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:.8rem">
+        <div class="yc"><div class="yc-val">${totalPlants.toLocaleString()}</div><div class="yc-lbl">TOTAL PLANTS</div></div>
+        <div class="yc"><div class="yc-val">${Math.round(totalPlants*0.78).toLocaleString()}</div><div class="yc-lbl">HEALTHY PLANTS</div></div>
+        <div class="yc"><div class="yc-val">${cp.yield}</div><div class="yc-lbl">EST. YIELD RANGE</div></div>
+      </div>
+    </div>
+    <div class="report-section">
+      <div class="rs-title">3. Soil Analysis & Fertilizer Plan</div>
+      <table class="tbl" style="margin-bottom:.7rem"><thead><tr><th>Parameter</th><th>Value</th><th>Status</th><th>Recommendation</th></tr></thead><tbody>
+        <tr><td>Organic Matter</td><td>3.8%</td><td><span class="pill p-g">Good</span></td><td>Maintain with compost application annually</td></tr>
+        <tr><td>pH (estimated)</td><td>6.2</td><td><span class="pill p-g">Ideal</span></td><td>No liming required; verify with lab test</td></tr>
+        <tr><td>Phosphorus</td><td>Low-Med</td><td><span class="pill p-w">Deficient</span></td><td>Apply DAP ${cp.fertP*2}kg/ha in eastern zones</td></tr>
+        <tr><td>Nitrogen</td><td>Medium</td><td><span class="pill p-s">Adequate</span></td><td>Top-dress CAN ${cp.fertN}kg/ha at active growth</td></tr>
+        <tr><td>Potassium</td><td>High</td><td><span class="pill p-g">Good</span></td><td>MOP ${cp.fertK}kg/ha to maintain levels</td></tr>
+      </tbody></table>
+    </div>
+    <div class="report-section">
+      <div class="rs-title">4. Water Management</div>
+      <div class="al al-s" style="margin-bottom:.5rem"><div class="al-ico">💧</div><div><strong>Irrigation Schedule:</strong> ${cp.waterFreq}</div></div>
+      <div class="al al-g" style="margin-bottom:.5rem"><div class="al-ico">📏</div><div><strong>Application Depth:</strong> ${cp.waterDepth}</div></div>
+      <div class="al al-r"><div class="al-ico">🔴</div><div><strong>Zone D Urgent:</strong> Soil moisture critically low (48%). Irrigate immediately with ${cp.waterDepth}.</div></div>
+    </div>
+    <div class="report-section">
+      <div class="rs-title">5. Disease & Pest Risk</div>
+      <table class="tbl"><thead><tr><th>Condition</th><th>Risk</th><th>Action</th></tr></thead><tbody>
+        <tr><td>${cp.diseases[0]}</td><td><span class="pill p-r">High</span></td><td>Apply KEPHIS-registered fungicide within 7 days in Zone B</td></tr>
+        <tr><td>${cp.diseases[1]}</td><td><span class="pill p-w">Medium</span></td><td>Scout weekly; prepare miticide/treatment</td></tr>
+        <tr><td>${cp.diseases[2]}</td><td><span class="pill p-g">Low</span></td><td>Continue routine monitoring</td></tr>
+      </tbody></table>
+    </div>
+    <div class="report-section">
+      <div class="rs-title">6. Priority Intervention Plan</div>
+      <div class="al al-r"><div class="al-ico">🔴</div><div><strong>P1 (0–7 days):</strong> Fungicide in Zone B · Irrigate Zone D · Scout ${cp.diseases[0]}</div></div>
+      <div class="al al-w" style="margin-top:5px"><div class="al-ico">🟡</div><div><strong>P2 (7–14 days):</strong> DAP ${cp.fertP*2}kg/ha eastern zones · CAN top-dress ${cp.fertN}kg/ha · Deep-rip Zone D</div></div>
+      <div class="al al-g" style="margin-top:5px"><div class="al-ico">🟢</div><div><strong>P3 (14–30 days):</strong> Lab soil sampling · Micronutrient foliar spray · NDVI re-assessment via ${state.selectedSats[0]||'Sentinel-2'}</div></div>
+    </div>
+    <div class="report-section" style="background:var(--g6);border-radius:8px;padding:.8rem;border:1px solid #b2dfcc">
+      <div class="rs-title" style="border:none">📡 Satellite Data Integration Summary</div>
+      <div style="font-size:12px;line-height:1.6">Active sources: <strong>${state.selectedSats.join(', ')}</strong><br>
+      Temporal NDVI trend: Positive over 90-day window (+0.04 average)<br>
+      Rainfall anomaly (CHIRPS): ${state.selectedSats.includes('CHIRPS')?'+8mm above average — favorable':'N/A'}<br>
+      Elevation: 1,842m ASL (SRTM) · Slope: 8.4° · Aspect: South-East</div>
+    </div>`;
 }
 
-async function askAI(){const q=document.getElementById('aiQuestion').value.trim();if(!q) return;askAICore(q);}
-function quickAsk(q){document.getElementById('aiQuestion').value=q;askAICore(q);}
+// ─── AI ───
+async function askAI(){
+  const q=document.getElementById('aiQ').value.trim();
+  if(!q)return;
+  doAsk(q);
+}
+function qAsk(q){document.getElementById('aiQ').value=q;doAsk(q);}
 
-async function askAICore(question){
-  const cont=document.getElementById('aiResponseContainer');
-  const textEl=document.getElementById('aiText');
-  cont.style.display='block';
-  textEl.textContent='Analysing your farm data...';
-  if(ANTHROPIC_API_KEY==='YOUR_ANTHROPIC_API_KEY_HERE'){textEl.innerHTML='<strong>API key not configured.</strong> Open this HTML file in a text editor, find <code>YOUR_ANTHROPIC_API_KEY_HERE</code> and replace it with your Anthropic API key from <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.';return;}
-  const profile=cropProfiles[farmData.crop]||cropProfiles.Tea;
-  const systemPrompt=`You are an expert agronomist specialising in Kenyan agriculture with deep knowledge of cash crops including Tea, Coffee, Maize, Wheat, Potatoes, Carrots, Sisal, Sunflower, Pyrethrum, Sorghum, Cotton, and horticultural crops.\n\nFarm context:\n- Farm: ${farmData.name||'Demo Farm'}, ${farmData.county||'Kiambu'} County\n- Primary crop: ${farmData.crop}\n- Area: ${farmData.area} ha\n- Season: ${farmData.season}\n- NDVI: 0.62 (optimal range for ${farmData.crop}: ${profile.ndviOptimal.join('–')})\n- Soil pH: 6.2 (optimal: ${profile.phOptimal.join('–')})\n- Soil moisture: 62% (optimal: ${profile.moistureOptimal.join('–')}%)\n- Identified risks: ${profile.diseases.slice(0,2).join(', ')}\n- Phosphorus: Low-medium (deficiency in eastern zones)\n\nProvide a concise, actionable, Kenya-specific agronomic response. Reference Kenya agricultural standards (KEPHIS, KALRO, Tea Board of Kenya where relevant). Be specific about products, rates, and timing relevant to Kenya.`;
+async function doAsk(question){
+  const out=document.getElementById('aiOut'), txt=document.getElementById('aiTxt');
+  out.style.display='block';txt.textContent='Analysing your farm data...';
+  if(ANTHROPIC_API_KEY==='YOUR_KEY_HERE'){
+    txt.innerHTML='<strong>API key not configured.</strong> Open this HTML file in a text editor, find <code>YOUR_KEY_HERE</code> and replace with your Anthropic API key from <a href="https://console.anthropic.com" target="_blank" style="color:#0d4790">console.anthropic.com</a>.';return;
+  }
+  const cp=CP[state.crop]||CP.Tea;
+  const sys=`You are a senior agronomist specialising in Kenyan agriculture with deep expertise in cash crops including Tea, Coffee, Maize, Wheat, Rice, Avocado, Potatoes, Carrots, Sisal, Sunflower, Pyrethrum, Sorghum, Cotton, and horticultural crops. You reference KEPHIS, KALRO, Tea Board of Kenya, Coffee Board standards.\n\nFarm data:\n- Name: ${state.name}, ${state.county} County, Kenya\n- Crop: ${state.crop} | Area: ${state.area}ha | Season: ${state.season}\n- NDVI: 0.62 (optimal ${cp.ndviOpt.join('–')}) | Soil pH: 6.2 | Moisture: 62%\n- Satellites active: ${state.selectedSats.join(', ')}\n- NPK: N-medium, P-deficient (Low-Med), K-high\n- Total estimated plants: ${Math.round(cp.plantDensity*state.area).toLocaleString()}\n- Water need: ${cp.waterNeed}mm/year | Irrigation: ${cp.waterFreq}\n- Disease risks: ${cp.diseases.slice(0,2).join(', ')}\n\nProvide specific, actionable Kenya-relevant advice. Include product names, rates, and timing.`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:systemPrompt,messages:[{role:'user',content:question}]})});
-    const data=await res.json();
-    const text=data.content?.map(c=>c.text||'').join('')||'No response received.';
-    textEl.innerHTML=text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
-  }catch(e){textEl.textContent='Connection error. Check your API key and internet connection.';}
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:question}]})});
+    const data=await r.json();
+    const t=data.content?.map(c=>c.text||'').join('')||'No response.';
+    txt.innerHTML=t.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  }catch(e){txt.textContent='Connection error. Check API key and internet.';}
 }
 
-function generateFullReport(){
-  const q=`Generate a comprehensive farm intelligence report for ${farmData.name||'the farm'} in ${farmData.county} growing ${farmData.crop}. Include: executive summary, vegetation health assessment with all index interpretations, soil health summary and nutrient management plan, disease and pest risk assessment, yield prediction with confidence interval, 90-day action plan with specific product recommendations for Kenya, and economic impact estimate. Format clearly with sections.`;
-  showPage('insights');askAICore(q);
+async function generateReport(){
+  const cp=CP[state.crop]||CP.Tea;
+  const q=`Generate a comprehensive farm intelligence report for ${state.name} in ${state.county} growing ${state.crop} (${state.area}ha). Include: (1) Executive Summary with overall farm score, (2) Vegetation analysis interpreting NDVI 0.62 and all 9 indices, (3) Crop count analysis — ${Math.round(cp.plantDensity*state.area).toLocaleString()} total plants with yield projection in ${cp.yieldUnit}, (4) Detailed NPK fertilizer plan with specific Kenyan products, rates and timing, (5) Water management schedule specifying how often and how much to irrigate for ${state.crop}, (6) Disease risk assessment for ${cp.diseases.join(', ')}, (7) 90-day intervention priority plan with cost estimates in KES.`;
+  nav('insights');doAsk(q);
 }
 
-function toggleSatellite(el,id){document.getElementById('toggle-'+id).classList.toggle('on');}
+// ─── SESSIONS ───
+function saveSession(){
+  const sess={id:Date.now(),name:state.name,crop:state.crop,county:state.county,area:state.area,season:state.season,sats:state.selectedSats,date:new Date().toLocaleDateString('en-GB')};
+  state.sessions.push(sess);
+  try{localStorage.setItem('agrovision_sessions',JSON.stringify(state.sessions));}catch(e){}
+  renderSessions();
+  alert('Session saved: '+sess.name+' ('+sess.crop+')');
+}
 
-// Init
-farmData.analysisRun=true;
-renderVIGrid();
-setTimeout(()=>{renderVegCharts();renderSoilCharts();renderCropHealth();renderAutoFindings();},300);
+function loadSessions(){
+  try{const s=localStorage.getItem('agrovision_sessions');if(s) state.sessions=JSON.parse(s);}catch(e){}
+  renderSessions();
+}
+
+function renderSessions(){
+  const list=document.getElementById('sessionsList');
+  const none=document.getElementById('noSessions');
+  if(!state.sessions.length){list.innerHTML='';none.style.display='block';return;}
+  none.style.display='none';
+  list.innerHTML='';
+  state.sessions.forEach(s=>{
+    const d=document.createElement('div');d.className='sess-item';
+    d.innerHTML=`<div><div class="sess-name">${s.name} — ${s.crop}</div><div class="sess-meta">${s.county} · ${s.area}ha · ${s.date} · Sats: ${(s.sats||[]).join(',')}</div></div><div class="sess-btns"><button class="btn btn-o btn-s" onclick="loadSession(${s.id})">Load</button><button class="btn btn-d btn-s" onclick="deleteSession(${s.id})">Del</button></div>`;
+    list.appendChild(d);
+  });
+  // Also update crop buttons with saved badges
+  document.querySelectorAll('.cb').forEach(cb=>{
+    const cr=cb.textContent.trim();
+    const saved=state.sessions.some(s=>s.crop===cr);
+    const existing=cb.querySelector('.saved-badge');
+    if(saved&&!existing){const b=document.createElement('div');b.className='saved-badge';b.textContent='SAVED';cb.appendChild(b);}
+    if(!saved&&existing) existing.remove();
+  });
+}
+
+function loadSession(id){
+  const s=state.sessions.find(x=>x.id===id);if(!s)return;
+  state.name=s.name;state.crop=s.crop;state.county=s.county;state.area=s.area;state.season=s.season;state.selectedSats=s.sats||['S2'];
+  document.getElementById('farmName').value=s.name;
+  document.getElementById('farmArea').value=s.area;
+  document.getElementById('hdrFarm').textContent=s.name;
+  document.getElementById('hdrCrop').textContent=s.crop;
+  document.getElementById('hdrSat').textContent=s.sats.join('+');
+  document.querySelectorAll('.cb').forEach(cb=>{cb.classList.toggle('sel',cb.textContent.trim()===s.crop);});
+  state.analysed=true;updateMeasures();
+  nav('mapview');
+}
+
+function deleteSession(id){
+  state.sessions=state.sessions.filter(s=>s.id!==id);
+  try{localStorage.setItem('agrovision_sessions',JSON.stringify(state.sessions));}catch(e){}
+  renderSessions();
+}
+
+function newSession(){
+  state={...state,name:'New Farm',crop:'Tea',county:'Kiambu',area:45,season:'Long Rains (Mar–Jun)',analysed:false,droneImage:null,annotations:[],measurePoints:[],selectedSats:['S2','SRTM']};
+  document.getElementById('farmName').value='';document.getElementById('farmArea').value='';
+  document.getElementById('hdrFarm').textContent='No farm';document.getElementById('hdrCrop').textContent='No crop';
+  document.querySelectorAll('.cb').forEach(cb=>{cb.classList.toggle('sel',cb.textContent.trim()==='Tea');});
+  nav('upload');
+}
+
+// ─── INIT ───
+window.onload=function(){
+  loadSessions();
+  // Set today's date defaults
+  const t=new Date().toISOString().split('T')[0];
+  const f=new Date(Date.now()-30*864e5).toISOString().split('T')[0];
+  document.getElementById('imgDate').value=t;
+  document.getElementById('satFrom').value=f;
+  document.getElementById('satTo').value=t;
+  // Demo mode: pre-run analysis
+  state.analysed=true;
+  updateMeasures();
+  renderVeg();renderSoil();renderCropCount();renderWater();renderFindings();renderReport();
+  setTimeout(renderMap,200);
+};
 </script>
-</body>
-</html>
+</body></html>
